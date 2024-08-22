@@ -12,52 +12,52 @@ class Item {
    * @param {object} [option] - Опции для элемента (не используется в текущей реализации).
    * @since 0.1.0
    */
-  constructor(content, option={}) {
-    const {next} = option;
-    this.setContent(content).setNext(next);
+  constructor(content, option = {}) {
+    const { next } = option;
+    this.content = content;
+    this.next = next;
   }
 
   /**
    * Устанавливает следующий элемент в списке.
    *
-   * @param {Item|null} [next] - Следующий элемент в списке или null.
-   * @returns {Item} Текущий экземпляр для цепочки вызовов.
+   * @param {Item} next - Следующий элемент. Пустой вызов метода установит в качестве ссылки на следующий элемент значение null.
+   * @throws {TypeError} Если next не является экземпляром Item.
    * @since 0.1.0
    */
-  setNext(next) {
-    this._next = next ?? null;
-    return this;
+  set next(next = null) {
+    if (next && !(next instanceof Item))
+      throw new TypeError("Next item must be an instance of Item");
+    this._next = next;
   }
 
   /**
-   * Получает следующий элемент в списке.
+   * Возвращает следующий элемент в списке.
    *
-   * @returns {Item|null} Следующий элемент в списке или null.
+   * @returns {Item|null} Следующий элемент или null.
    * @since 0.1.0
    */
-  getNext() {
+  get next() {
     return this._next;
   }
 
   /**
    * Устанавливает содержимое элемента.
    *
-   * @param {string|null} [content] - Содержимое элемента или null.
-   * @returns {Item} Текущий экземпляр для цепочки вызовов.
+   * @param {*} content - Новое содержимое элемента. Пустой вызов метода установит содержимое null.
    * @since 0.1.0
    */
-  setContent(content) {
-    this._content = content ?? null;
-    return this;
+  set content(content = null) {
+    this._content = content;
   }
 
   /**
-   * Получает содержимое элемента.
+   * Возвращает содержимое элемента.
    *
-   * @returns {string|null} Содержимое элемента или null.
+   * @returns {*} Содержимое элемента или null.
    * @since 0.1.0
    */
-  getContent() {
+  get content() {
     return this._content;
   }
 }
