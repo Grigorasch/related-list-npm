@@ -28,8 +28,7 @@ describe("Тесты класса RelatedList", () => {
       expect(list._current).toBe(list._head);
       expect(list._current.content).toBe("test_content");
       value = list.next();
-      console.log(value);
-expect(value).toBe("next_content");
+      expect(value).toBe("next_content");
       expect(list._current).toBe(list._tail);
       value = list.next();
       expect(value).toBeNull();
