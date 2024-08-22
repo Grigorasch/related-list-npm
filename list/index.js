@@ -69,16 +69,6 @@ class RelatedList {
   }
 
   /**
-   * Возвращает элемент с текущей позиции.
-   * @returns {*} Элемент с текущей позиции или undefined, если достигнут конец списка.
-   * @since 0.1.0
-   */
-  current() {
-    if (!this._current) return;
-    return this._current.content;
-  }
-
-  /**
    * Добавляет новый элемент в конец списка.
    * @param {any} value - Значение для добавления в список.
    * @since 0.1.0
