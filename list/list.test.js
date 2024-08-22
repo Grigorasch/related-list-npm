@@ -51,4 +51,14 @@ describe("Тесты класса RelatedList", () => {
       });
     });
   });
+  describe("Метод remove", () =>{
+    test("должен удалить элемент из списка", () =>{
+      const data = ["item1", "item2", "item3"];
+      const list = new RelatedList();
+      data.forEach(list.add.bind(list));
+      list.next();
+      list.next();
+      list.remove();
+    });
+  });
 });
