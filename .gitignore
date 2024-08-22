@@ -136,3 +136,4 @@ replit.nix
 *.breakpoints
 README_RU.md
 docs
+.vscode
