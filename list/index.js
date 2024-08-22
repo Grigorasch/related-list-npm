@@ -26,7 +26,7 @@ class RelatedList {
       return;
     }
     this._current = this._head;
-    return this.current();
+    return this.current;
   }
 
   /**
@@ -38,7 +38,7 @@ class RelatedList {
   next() {
     if (this._current) {
       this._current = this._current.next;
-      return this.current();
+      return this.current;
     } else {
       return this.start();
     }
