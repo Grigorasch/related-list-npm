@@ -10,7 +10,7 @@ describe("Тесты класса RelatedList", () => {
     });
   });
 
-  describe("Метод add", () =>{
+  describe("Метод add", () => {
     test("должен добавить элемент в список", () => {
       const list = new RelatedList();
       list.add("test_content");
@@ -21,8 +21,8 @@ describe("Тесты класса RelatedList", () => {
       list.add("next_content");
       expect(list._head.content).toBe("test_content");
       expect(list._tail.content).toBe("next_content");
-      let value = list.current()
-      expect(value).toBeNull();
+      let value = list.current;
+      expect(value).toBeUndefined();
       value = list.next();
       expect(value).toBe("test_content");
       expect(list._current).toBe(list._head);
@@ -31,9 +31,24 @@ describe("Тесты класса RelatedList", () => {
       expect(value).toBe("next_content");
       expect(list._current).toBe(list._tail);
       value = list.next();
-      expect(value).toBeNull();
+      expect(value).toBeUndefined();
       expect(list._current).toBeNull();
     });
-    
+    test("должен изменить значения всех элементов в списке", () => {
+      const data = ["item1", "item2", "item3"];
+      const newdata = ["new_item1", "new_item2", "new_item3"];
+      const list = new RelatedList();
+      data.forEach(list.add.bind(list));
+      newdata.forEach((item, index) => {
+        list.next();
+        expect(list.current).toBe(data[index]);
+        list.current = item;
+      });
+      list.next();
+      newdata.forEach((item) => {
+        list.next();
+        expect(list.current).toBe(item);
+      });
+    });
   });
 });
