@@ -1,0 +1,27 @@
+{
+  "name": "related-list",
+  "version": "0.0.0",
+  "description": "The module provides a data structure such as a linked list for JavaScript projects",
+  "main": "index.js",
+  "scripts": {
+    "run": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Grigorasch/related-list-npm-.git"
+  },
+  "keywords": [
+    "linked list",
+    "related list",
+    "data structure"
+  ],
+  "author": "Grigorasch",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Grigorasch/related-list-npm-/issues"
+  },
+  "homepage": "https://github.com/Grigorasch/related-list-npm-#readme",
+  "devDependencies": {
+    "jest": "^29.7.0"
+  }
+}

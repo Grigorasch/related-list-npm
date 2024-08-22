@@ -1,2 +1,19 @@
-# related-list-npm-
-The module provides a data structure such as a linked list for your JavaScript project
+# Linked List Module
+
+## Description
+
+## Installation
+
+## Usage
+
+## Methods
+
+### `append(value)`
+
+### `prepend(value)`
+
+### `delete(value)`
+
+### `toString()`
+
+## License

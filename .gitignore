@@ -128,3 +128,10 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
+
+# My settings
+*.replit
+replit.nix
+.config
+*.breakpoints
+README_RU.md
