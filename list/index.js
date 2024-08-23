@@ -1,5 +1,9 @@
 const Item = require("../item");
+const lists = new WeakMap();
+const loadOptions = (context, options) =>
+  require("./load_options")(context, lists, options);
 
+const space = Symbol('space');
 /**
  * Класс представляющий связанный список.
  * @since 0.1.0
@@ -10,10 +14,26 @@ class RelatedList {
    * @constructor
    * @since 0.1.0
    */
-  constructor() {
-    this._head = null;
-    this._tail = null;
-    this._current = null;
+  constructor(options = {}) {
+    const props = {
+      head: null,
+      tail: null,
+      current: null,
+    };
+    lists.set(this, props);
+
+    loadOptions(this, options);
+
+    Object.defineProperty(this, space, {
+      value: lists.get(this),
+      writable: false,
+      enumerable: false,
+      configurable: true,
+    });
+  }
+
+  get length() {
+    return this[space].length()  // lists.get(this).length();
   }
 
   /**
@@ -21,7 +41,7 @@ class RelatedList {
    * @since 0.2.0
    */
   start() {
-    this._current = null;
+    this[space].current = null;
   }
 
   /**
@@ -31,10 +51,10 @@ class RelatedList {
    * @version 0.2.0
    */
   head() {
-    if (this._head === null) {
+    if (this[space].head === null) {
       return;
     }
-    this._current = this._head;
+    this[space].current = this[space].head;
     return this.current;
   }
 
@@ -45,8 +65,8 @@ class RelatedList {
    * @since 0.1.0
    */
   next() {
-    if (this._current) {
-      this._current = this._current.next;
+    if (this[space].current) {
+      this[space].current = this[space].current.next;
       return this.current;
     } else {
       return this.head();
@@ -60,7 +80,7 @@ class RelatedList {
    * @since 0.2.0
    */
   isEnd() {
-    return !this._current || this._current.next === null;
+    return !this[space].current || this[space].current.next === null;
   }
 
   /**
@@ -70,7 +90,11 @@ class RelatedList {
    * @since 0.2.0
    */
   isNext() {
-    return !this._current || this._current.next !== null;
+    return !!this[space].head && (!this[space].current || this[space].current.next !== null);
+  }
+
+  isEmpty() {
+    return lists.get(this).head === null;
   }
 
   /**
@@ -80,11 +104,11 @@ class RelatedList {
    * @since 0.2.0
    */
   set current(value) {
-    if (!this._current)
+    if (!this[space].current)
       throw new RangeError(
         "It is not possible to change the current element. The end of the list has been reached",
       );
-    this._current.content = value;
+    this[space].current.content = value;
   }
 
   /**
@@ -93,8 +117,8 @@ class RelatedList {
    * @since 0.2.0
    */
   get current() {
-    if (!this._current) return;
-    return this._current.content;
+    if (!this[space].current) return;
+    return this[space].current.content;
   }
 
   /**
@@ -104,13 +128,14 @@ class RelatedList {
    */
   add(value) {
     const item = new Item(value);
-    if (this._tail) {
-      this._tail.next = item;
-      item.previous = this._tail;
+    if (this[space].tail) {
+      this[space].tail.next = item;
+      item.previous = this[space].tail;
     } else {
-      this._head = item;
+      this[space].head = item;
     }
-    this._tail = item;
+    this[space].tail = item;
+    this[space].length.add()
   }
 
   /**
@@ -120,20 +145,20 @@ class RelatedList {
    * @since 0.2.0
    */
   remove() {
-    if (!this._current)
+    if (!this[space].current)
       throw new RangeError(
         "It is not possible to remove the current element. The current position is out of list bounds.",
       );
-
-    if (this._current.next) {
-      this._current.next.previous = this._current.previous;
+this[space].length.remove();
+    if (this[space].current.next) {
+      this[space].current.next.previous = this[space].current.previous;
     } else {
-      this._tail = this._current.previous;
+      this[space].tail = this[space].current.previous;
     }
-    if (this._current.previous) {
-      this._current.previous.next = this._current.next;
+    if (this[space].current.previous) {
+      this[space].current.previous.next = this[space].current.next;
     } else {
-      this._head = this._current.next;
+      this[space].head = this[space].current.next;
     }
   }
 }
