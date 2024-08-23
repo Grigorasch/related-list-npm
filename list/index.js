@@ -122,20 +122,24 @@ class RelatedList {
   }
 
   /**
-   * Добавляет новый элемент в конец списка.
-   * @param {any} value - Значение для добавления в список.
+   * Добавляет новые элементы в конец списка.
+   * @param {...any} values - Значения для добавления в список.
+   * @returns {void}
    * @since 0.1.0
+   * @version 0.2.0
    */
-  add(value) {
-    const item = new Item(value);
-    if (this[space].tail) {
-      this[space].tail.next = item;
-      item.previous = this[space].tail;
-    } else {
-      this[space].head = item;
-    }
-    this[space].tail = item;
-    this[space].length.add()
+  add(...values) {
+    values.forEach(value => {
+      const item = new Item(value);
+      if (this[space].tail) {
+        this[space].tail.next = item;
+        item.previous = this[space].tail;
+      } else {
+        this[space].head = item;
+      }
+      this[space].tail = item;
+      this[space].length.add()
+    });
   }
 
   /**
