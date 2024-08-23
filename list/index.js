@@ -3,7 +3,7 @@ const lists = new WeakMap();
 const loadOptions = (context, options) =>
   require("./load_options")(context, lists, options);
 
-const space = Symbol('space');
+const scope = Symbol('RelatedListScope');
 /**
  * Класс представляющий связанный список.
  * @since 0.1.0
@@ -24,7 +24,7 @@ class RelatedList {
 
     loadOptions(this, options);
 
-    Object.defineProperty(this, space, {
+    Object.defineProperty(this, scope, {
       value: lists.get(this),
       writable: false,
       enumerable: false,
@@ -33,7 +33,7 @@ class RelatedList {
   }
 
   get length() {
-    return this[space].length()  // lists.get(this).length();
+    return this[scope].length()  // lists.get(this).length();
   }
 
   /**
@@ -41,7 +41,7 @@ class RelatedList {
    * @since 0.2.0
    */
   start() {
-    this[space].current = null;
+    this[scope].current = null;
   }
 
   /**
@@ -51,10 +51,10 @@ class RelatedList {
    * @version 0.2.0
    */
   head() {
-    if (this[space].head === null) {
+    if (this[scope].head === null) {
       return;
     }
-    this[space].current = this[space].head;
+    this[scope].current = this[scope].head;
     return this.current;
   }
 
@@ -65,8 +65,8 @@ class RelatedList {
    * @since 0.1.0
    */
   next() {
-    if (this[space].current) {
-      this[space].current = this[space].current.next;
+    if (this[scope].current) {
+      this[scope].current = this[scope].current.next;
       return this.current;
     } else {
       return this.head();
@@ -80,7 +80,7 @@ class RelatedList {
    * @since 0.2.0
    */
   isEnd() {
-    return !this[space].current || this[space].current.next === null;
+    return !this[scope].current || this[scope].current.next === null;
   }
 
   /**
@@ -90,7 +90,7 @@ class RelatedList {
    * @since 0.2.0
    */
   isNext() {
-    return !!this[space].head && (!this[space].current || this[space].current.next !== null);
+    return !!this[scope].head && (!this[scope].current || this[scope].current.next !== null);
   }
 
   isEmpty() {
@@ -104,11 +104,11 @@ class RelatedList {
    * @since 0.2.0
    */
   set current(value) {
-    if (!this[space].current)
+    if (!this[scope].current)
       throw new RangeError(
         "It is not possible to change the current element. The end of the list has been reached",
       );
-    this[space].current.content = value;
+    this[scope].current.content = value;
   }
 
   /**
@@ -117,8 +117,8 @@ class RelatedList {
    * @since 0.2.0
    */
   get current() {
-    if (!this[space].current) return;
-    return this[space].current.content;
+    if (!this[scope].current) return;
+    return this[scope].current.content;
   }
 
   /**
@@ -131,14 +131,14 @@ class RelatedList {
   add(...values) {
     values.forEach(value => {
       const item = new Item(value);
-      if (this[space].tail) {
-        this[space].tail.next = item;
-        item.previous = this[space].tail;
+      if (this[scope].tail) {
+        this[scope].tail.next = item;
+        item.previous = this[scope].tail;
       } else {
-        this[space].head = item;
+        this[scope].head = item;
       }
-      this[space].tail = item;
-      this[space].length.add()
+      this[scope].tail = item;
+      this[scope].length.add()
     });
   }
 
@@ -149,20 +149,28 @@ class RelatedList {
    * @since 0.2.0
    */
   remove() {
-    if (!this[space].current)
+    if (!this[scope].current)
       throw new RangeError(
         "It is not possible to remove the current element. The current position is out of list bounds.",
       );
-this[space].length.remove();
-    if (this[space].current.next) {
-      this[space].current.next.previous = this[space].current.previous;
+this[scope].length.remove();
+    if (this[scope].current.next) {
+      this[scope].current.next.previous = this[scope].current.previous;
     } else {
-      this[space].tail = this[space].current.previous;
+      this[scope].tail = this[scope].current.previous;
     }
-    if (this[space].current.previous) {
-      this[space].current.previous.next = this[space].current.next;
+    if (this[scope].current.previous) {
+      this[scope].current.previous.next = this[scope].current.next;
     } else {
-      this[space].head = this[space].current.next;
+      this[scope].head = this[scope].current.next;
+    }
+  }
+
+  [Symbol.iterator] = function* () {
+    let current = this[scope].head;
+    while (current) {
+      yield current.content;
+      current = current.next;
     }
   }
 }
