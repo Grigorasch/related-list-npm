@@ -48,8 +48,6 @@ describe("Тесты класса RelatedList", () => {
       list.remove();
       expect(list.length).toBe(3);
     });
-
-    
   });
   describe("Значение текущего элемента current", () => {
     test("должен получить его значение и присвоить новое", () => {
@@ -71,7 +69,7 @@ describe("Тесты класса RelatedList", () => {
       expect(list.length).toBe(3);
     });
   });
-  
+
   describe("Метод remove", () => {
     test("должен удалить элемент из списка", () => {
       const data = ["item1", "item2", "item3"];
@@ -155,6 +153,26 @@ describe("Тесты класса RelatedList", () => {
       expect(list.head()).toBe("item1");
       expect(list.head()).toBe("item1");
       expect(list.next()).toBe("item2");
+    });
+  });
+
+  describe("Проверка итератора", () => {
+    test("должен вернуть все элементы списка", () => {
+      const data = ["item1", "item2", "item3", "item4", "item5"];
+      const list = new RelatedList();
+      list.add(...data);
+      for (const item of list) {
+        expect(item).toBe(data.shift());
+      }
+    });
+    test("метод map должен вернуть преобразованными все элементы списка", () => {
+      const data = [1, 5, 8, 2, 8, 3];
+      const list = new RelatedList();
+      list.add(...data);
+      const newList = list.map((item) => item * 2);
+      newList.forEach((item, index) => {
+        expect(item).toBe(data[index] * 2);
+      })
     });
   });
 });
