@@ -91,7 +91,7 @@ describe("Тесты класса RelatedList", () => {
       list.next();
       expect(list.isEnd()).toBe(true);
     });
-    test("isNext в разных положениях", () =>{
+    test("isNext в разных положениях", () => {
       const list = new RelatedList();
       list.add("item1");
       list.add("item2");
@@ -108,6 +108,29 @@ describe("Тесты класса RelatedList", () => {
       expect(list.isNext()).toBe(false);
       list.next();
       expect(list.isNext()).toBe(true);
+    });
+    test("start и head в разных положениях", () => {
+      const list = new RelatedList();
+      list.add("item1");
+      list.add("item2");
+      list.add("item3");
+      list.add("item4");
+      expect(list.head()).toBe("item1");
+      expect(list.next()).toBe("item2");
+      list.next();
+      list.next();
+      expect(list.head()).toBe("item1");
+      expect(list.next()).toBe("item2");
+      list.next();
+      list.start();
+      expect(list.next()).toBe("item1");
+      expect(list.next()).toBe("item2");
+      list.start();
+      list.start();
+      expect(list.next()).toBe("item1");
+      expect(list.head()).toBe("item1");
+      expect(list.head()).toBe("item1");
+      expect(list.next()).toBe("item2");
     });
   });
 });
