@@ -60,7 +60,7 @@ class RelatedList {
    * @since 0.2.0
    */
   isEnd() {
-    return !this._current ?? this._current.next === null;
+    return !this._current || this._current.next === null;
   }
 
   /**
@@ -70,7 +70,7 @@ class RelatedList {
    * @since 0.2.0
    */
   isNext() {
-    return !this._current ?? this._current.next !== null;
+    return !this._current || this._current.next !== null;
   }
 
   /**
