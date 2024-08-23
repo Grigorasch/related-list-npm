@@ -166,11 +166,61 @@ this[scope].length.remove();
     }
   }
 
+  /**
+   * Итератор для объектов класса RelatedList.
+   * Позволяет перебирать элементы списка в порядке их добавления при помощи for ... of.
+   * @returns {Iterator} Итератор для элементов списка.
+   * @since 0.2.0
+   */
   [Symbol.iterator] = function* () {
     let current = this[scope].head;
     while (current) {
       yield current.content;
       current = current.next;
+    }
+  }
+
+  /**
+   * Применяет указанную функцию к каждому элементу списка и возвращает новый список с результатами вызова этой функции.
+   * @param {function(any, number, RelatedList): any} callback - Функция, вызываемая для каждого элемента списка;
+   *            принимает три аргумента: текущий элемент, его индекс и сам список.
+   * @param {Object} [thisArg={}] - Значение, используемое в качестве `this` при вызове `callback`.
+   * @throws {TypeError} Если `callback` не является функцией.
+   * @returns {RelatedList} Новый список с результатами вызова `callback`.
+   * @since 0.2.0
+   */
+  map(callback, thisArg={}) {
+    if (typeof callback !== 'function') throw new TypeError('callback is not a function');
+    const result = new RelatedList();
+    const iterator = this[Symbol.iterator]();
+    let index = 0
+    while (true) {
+      const item = iterator.next()
+      if (item.done) break;
+      result.add(callback.call(thisArg, item.value, index, this));
+      index++;
+    }
+    return result;
+  }
+
+  /**
+   * Вызывает указанную функцию один раз для каждого элемента списка.
+   * @param {function(any, number, RelatedList): void} callback - Функция, вызываемая для каждого элемента списка;
+   *           принимает три аргумента: текущий элемент, его индекс и сам список.
+   * @param {Object} [thisArg={}] - Значение, используемое в качестве `this` при вызове `callback`.
+   * @throws {TypeError} Если `callback` не является функцией.
+   * @returns {void}
+   * @since 0.2.0
+   */
+  forEach(callback, thisArg={}) {
+    if (typeof callback !== 'function') throw new TypeError('callback is not a function');
+    const iterator = this[Symbol.iterator]();
+    let index = 0
+    while (true) {
+      const item = iterator.next()
+      if (item.done) break;
+      callback.call(thisArg, item.value, index, this);
+      index++;
     }
   }
 }
