@@ -51,14 +51,63 @@ describe("Тесты класса RelatedList", () => {
       });
     });
   });
-  describe("Метод remove", () =>{
-    test("должен удалить элемент из списка", () =>{
+  describe("Метод remove", () => {
+    test("должен удалить элемент из списка", () => {
       const data = ["item1", "item2", "item3"];
       const list = new RelatedList();
       data.forEach(list.add.bind(list));
       list.next();
       list.next();
       list.remove();
+      list.start();
+      data.splice(1, 1);
+      data.forEach((item) => {
+        list.next();
+        expect(list.current).toBe(item);
+      });
+    });
+    test("должен выбросить RangeError при удалении элемента за пределами списка", () => {
+      const list = new RelatedList();
+      expect(() => list.remove()).toThrow(RangeError);
+    });
+  });
+
+  describe("Проверка методов начала и конца списка", () => {
+    test("isEnd в разных положениях", () => {
+      const list = new RelatedList();
+      list.add("item1");
+      list.add("item2");
+      list.add("item3");
+      list.add("item4");
+      expect(list.isEnd()).toBe(true);
+      list.next();
+      expect(list.isEnd()).toBe(false);
+      list.next();
+      expect(list.isEnd()).toBe(false);
+      list.next();
+      expect(list.isEnd()).toBe(false);
+      list.next();
+      expect(list.isEnd()).toBe(true);
+      list.next();
+      expect(list.isEnd()).toBe(true);
+    });
+    test("isNext в разных положениях", () =>{
+      const list = new RelatedList();
+      list.add("item1");
+      list.add("item2");
+      list.add("item3");
+      list.add("item4");
+      expect(list.isNext()).toBe(true);
+      list.next();
+      expect(list.isNext()).toBe(true);
+      list.next();
+      expect(list.isNext()).toBe(true);
+      list.next();
+      expect(list.isNext()).toBe(true);
+      list.next();
+      expect(list.isNext()).toBe(false);
+      list.next();
+      expect(list.isNext()).toBe(true);
     });
   });
 });
