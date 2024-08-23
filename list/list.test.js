@@ -157,4 +157,15 @@ describe("Тесты класса RelatedList", () => {
       expect(list.next()).toBe("item2");
     });
   });
+
+  describe("Проверка итератора", () =>{
+    test("должен вернуть все элементы списка", () => {
+      const data = ["item1", "item2", "item3", "item4", "item5"];
+      const list = new RelatedList();
+      list.add(...data);
+      for (const item of list) {
+        expect(item).toBe(data.shift());
+      }
+    });
+  });
 });
