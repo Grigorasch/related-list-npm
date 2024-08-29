@@ -1,0 +1,10 @@
+.gitignore
+.conf
+.git
+.config
+__mocks__
+*.test.js
+.cache
+.local
+.breakpoints
+.replit
