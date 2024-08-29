@@ -3,7 +3,7 @@ const lists = new WeakMap();
 const loadOptions = (context, options) =>
   require("./load_options")(context, lists, options);
 
-const scope = Symbol('RelatedListScope');
+const scope = Symbol("RelatedListScope");
 /**
  * Класс представляющий связанный список.
  * @since 0.1.0
@@ -32,8 +32,14 @@ class RelatedList {
     });
   }
 
+  /**
+   * Возвращает количество элементов в списке.
+   * @type {number}
+   * @readonly
+   * @since 0.2.0
+   */
   get length() {
-    return this[scope].length()  // lists.get(this).length();
+    return this[scope].length();
   }
 
   /**
@@ -90,7 +96,10 @@ class RelatedList {
    * @since 0.2.0
    */
   isNext() {
-    return !!this[scope].head && (!this[scope].current || this[scope].current.next !== null);
+    return (
+      !!this[scope].head &&
+      (!this[scope].current || this[scope].current.next !== null)
+    );
   }
 
   isEmpty() {
@@ -129,7 +138,7 @@ class RelatedList {
    * @version 0.2.0
    */
   add(...values) {
-    values.forEach(value => {
+    values.forEach((value) => {
       const item = new Item(value);
       if (this[scope].tail) {
         this[scope].tail.next = item;
@@ -138,9 +147,50 @@ class RelatedList {
         this[scope].head = item;
       }
       this[scope].tail = item;
-      this[scope].length.add()
+      this[scope].length.add();
     });
   }
+
+  // addBefore(...values) {
+  //   if (!this[scope].current)
+  //     throw new RangeError(
+  //       "It is not possible to remove the current element. The current position is out of list bounds.",
+  //     );
+  //   values.forEach((value) => {
+  //     const item = new Item(value);
+  //     item.next = this[scope].current;
+  //     if (this[scope].current.previous) {
+  //       this[scope].current.previous.next = item;
+  //       item.previous = this[scope].current.previous;
+  //     } else {
+  //       this[scope].head = item;
+  //       item
+  //     }
+  //     this[scope].current.previous = item;
+  //     this[scope].length.add();
+  //   });
+  // }
+
+  // addAfter(...values) {
+  //   if (!this[scope].current)
+  //     throw new RangeError(
+  //       "It is not possible to remove the current element. The current position is out of list bounds.",
+  //     );
+  //   values.forEach((value) => {
+  //     const item = new Item(value);
+  //     item.previous = this[scope].current;
+  //     if (this[scope].current.next) {
+  //       this[scope].current.next.previous = item;
+  //       item.next = this[scope].current.next;
+  //     } else {
+  //       this[scope].tail = item;
+  //       item
+  //     }
+  //     this[scope].current.next = item;
+  //     this[scope].length.add();
+  //   });
+    
+  // }
 
   /**
    * Удаляет текущий элемент из списка.
@@ -153,7 +203,7 @@ class RelatedList {
       throw new RangeError(
         "It is not possible to remove the current element. The current position is out of list bounds.",
       );
-this[scope].length.remove();
+    this[scope].length.remove();
     if (this[scope].current.next) {
       this[scope].current.next.previous = this[scope].current.previous;
     } else {
@@ -179,7 +229,7 @@ this[scope].length.remove();
       yield current.content;
       current = current.next;
     }
-  }
+  };
 
   /**
    * Применяет указанную функцию к каждому элементу списка и возвращает новый список с результатами вызова этой функции.
@@ -190,13 +240,14 @@ this[scope].length.remove();
    * @returns {RelatedList} Новый список с результатами вызова `callback`.
    * @since 0.2.0
    */
-  map(callback, thisArg={}) {
-    if (typeof callback !== 'function') throw new TypeError('callback is not a function');
+  map(callback, thisArg = {}) {
+    if (typeof callback !== "function")
+      throw new TypeError("callback is not a function");
     const result = new RelatedList();
     const iterator = this[Symbol.iterator]();
-    let index = 0
+    let index = 0;
     while (true) {
-      const item = iterator.next()
+      const item = iterator.next();
       if (item.done) break;
       result.add(callback.call(thisArg, item.value, index, this));
       index++;
@@ -213,12 +264,13 @@ this[scope].length.remove();
    * @returns {void}
    * @since 0.2.0
    */
-  forEach(callback, thisArg={}) {
-    if (typeof callback !== 'function') throw new TypeError('callback is not a function');
+  forEach(callback, thisArg = {}) {
+    if (typeof callback !== "function")
+      throw new TypeError("callback is not a function");
     const iterator = this[Symbol.iterator]();
-    let index = 0
+    let index = 0;
     while (true) {
-      const item = iterator.next()
+      const item = iterator.next();
       if (item.done) break;
       callback.call(thisArg, item.value, index, this);
       index++;
