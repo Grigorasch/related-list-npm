@@ -81,6 +81,7 @@ describe("Тесты класса RelatedList", () => {
       list.next();
       list.remove();
       expect(list.length).toBe(2);
+      expect(list.current).toBe("item3");
       list.start();
       data.splice(1, 1);
       data.forEach((item) => {

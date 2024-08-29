@@ -164,6 +164,7 @@ this[scope].length.remove();
     } else {
       this[scope].head = this[scope].current.next;
     }
+    this.next();
   }
 
   /**
