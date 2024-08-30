@@ -211,3 +211,13 @@ itemList.add('4');
 console.log('itemList', itemList.toArray()) // ['1', '2', '3', '4']
 console.log('newItemList', newItemList.toArray()) // ['1', '2', '3']
 ```
+
+### Reverse sequence
+
+If necessary, the sequence of list traversal can be reversed. In this case, the last element is considered first, and further traversal is performed by searching all elements in reverse order.
+
+```js
+const RelatedList = require("related-list");
+const itemList = new RelatedList({reverseDirection: true});
+itemList.add('1', '2', '3');
+```
