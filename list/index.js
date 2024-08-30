@@ -338,4 +338,5 @@ function addToAfter(item) {
     item;
   }
   this[scope].current.next = item;
+  this.next();
 }
