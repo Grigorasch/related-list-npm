@@ -44,6 +44,15 @@ console.log(itemList.next());  // undefined
 console.log(itemList.next());  // 1
 ```
 
+Returning to the previous element is done using the *prev()* method. The method moves to the previous element and returns it.
+
+```js
+console.log(itemList.next());  // 2
+console.log(itemList.prev());  // 1
+console.log(itemList.prev());  // undefined
+console.log(itemList.prev());  // undefined
+```
+
 > A linked list does not provide the sequence number of the current element, nor does it have the ability to access the elements of the list by sequence number.
 
 The *current* property provides access to the current element. The property getter returns the value of the element, and setter allows you to modify it. The *remove()* method is used to remove the current element
