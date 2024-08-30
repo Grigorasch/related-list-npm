@@ -70,6 +70,24 @@ console.log(itemList.next());  // 1
 console.log(itemList.next());  // 2
 ```
 
+Для добавления элементов у текущего элемента, исполльзуются методы *addBefore()* и *addAfter()*
+
+```js
+itemList.head();  // 1
+itemList.next();  // 2
+itemList.addBefore('1.1', '1.2', '1.3');
+itemList.addAfter('2.1', '2.2', '2.3');
+// 1
+// 1.1
+// 1.2
+// 1.3
+// 2
+// 2.1
+// 2.2
+// 2.3
+// 3
+```
+
 
 Список также предоставляет справочную информацию:
 

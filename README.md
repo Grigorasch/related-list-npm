@@ -73,6 +73,24 @@ console.log(itemList.next());  // 1
 console.log(itemList.next());  // 2
 ```
 
+To add elements to the current element, the *addBefore()* and *addAfter()* methods are used.
+
+```js
+itemList.head();  // 1
+itemList.next();  // 2
+itemList.addBefore('1.1', '1.2', '1.3');
+itemList.addAfter('2.1', '2.2', '2.3');
+// 1
+// 1.1
+// 1.2
+// 1.3
+// 2
+// 2.1
+// 2.2
+// 2.3
+// 3
+```
+
 
 The list also provides background information:
 
