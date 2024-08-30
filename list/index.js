@@ -1,8 +1,7 @@
 const Item = require("../item");
 // Коллекция связанных списков. Используется для хранения данных связанных списков.
 const lists = new WeakMap();
-// Коллекция элементов. Картотека связанных списков по id
-const listsId = new WeakSet();
+
 const loadOptions = (context, options) =>
   require("./load_options")(context, lists, options);
 // Символ для доступа к полю содержимого элемента
@@ -81,6 +80,18 @@ class RelatedList {
     } else {
       return this.head();
     }
+  }
+
+  /**
+   * Перемещает текущую позицию к предыдущему элементу и возвращает его.
+   *
+   * @returns {Item} - Предыдущий элемент в списке, или undefined, если текущий элемент является первым элементом.
+   * @since 0.3.0
+   */
+  prev() {
+    if (!this[scope].current) return;
+    this[scope].current = this[scope].current.previous;
+    return this.current;
   }
 
   /**
