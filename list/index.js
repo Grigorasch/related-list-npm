@@ -117,10 +117,7 @@ class RelatedList {
    * @since 0.2.0
    */
   set current(value) {
-    if (!this[scope].current)
-      throw new RangeError(
-        "It is not possible to change the current element. The end of the list has been reached",
-      );
+    this._checkCurrentItemExist();
     this[scope].current.content = value;
   }
 
@@ -142,8 +139,8 @@ class RelatedList {
    * @version 0.2.0
    */
   add(...values) {
-    // Для каждого элемента используется стратегия добавления в конец списка 
-    values.forEach(addElementByStrategy(addToEnd));
+    // Для каждого элемента используется стратегия добавления в конец списка
+    values.forEach(addElementByStrategy(addToEnd, this));
   }
 
   /**
@@ -155,9 +152,9 @@ class RelatedList {
    */
   addBefore(...values) {
     // Проверка что current элемент выбран
-    checkCurrentItemExist();
-    // Для каждого элемента используется стратегия добавления перед текущим элементом 
-    values.forEach(addElementByStrategy(addToBefore));
+    this._checkCurrentItemExist();
+    // Для каждого элемента используется стратегия добавления перед текущим элементом
+    values.forEach(addElementByStrategy(addToBefore, this));
   }
 
   /**
@@ -169,9 +166,9 @@ class RelatedList {
    */
   addAfter(...values) {
     // Проверка что current элемент выбран
-checkCurrentItemExist();
+    this._checkCurrentItemExist();
     // Для каждого элемента используется стратегия добавления после текущего элемента
-    values.forEach(addElementByStrategy(addToAfter));
+    values.forEach(addElementByStrategy(addToAfter, this));
   }
 
   /**
@@ -181,7 +178,7 @@ checkCurrentItemExist();
    * @since 0.2.0
    */
   remove() {
-    checkCurrentItemExist();
+    this._checkCurrentItemExist();
 
     this[scope].length.remove();
     if (this[scope].current.next) {
@@ -256,10 +253,23 @@ checkCurrentItemExist();
       index++;
     }
   }
+
+  /**
+   * Функция проверяет, выбран ли текущий элемент.
+   * @private
+   *
+   * @throws {RangeError} Выбрасывается, если текущий элемент не выбран.
+   * @since 0.3.0
+   */
+  _checkCurrentItemExist() {
+    if (!this[scope].current)
+      throw new RangeError(
+        "It is not possible to remove the current element. The current position is out of list bounds.",
+      );
+  }
 }
 
 module.exports = RelatedList;
-
 
 /**
  * Создает функцию, которая добавляет элемент в список по заданной стратегии.
@@ -269,12 +279,13 @@ module.exports = RelatedList;
  * @returns {function(any)} - Функция, которая добавляет элемент в список.
  * @since 0.3.0
  */
-function addElementByStrategy(strategy) {
+function addElementByStrategy(strategy, context) {
   return (value) => {
     const item = new Item(value);
-      strategy(item);
-    this[scope].length.add();
-  }
+    // strategy(item);
+    strategy.call(context, item);
+    context[scope].length.add();
+  };
 }
 
 /**
@@ -327,17 +338,4 @@ function addToAfter(item) {
     item;
   }
   this[scope].current.next = item;
-}
-
-/**
- * Функция проверяет, выбран ли текущий элемент.
- *
- * @throws {RangeError} Выбрасывается, если текущий элемент не выбран.
- * @since 0.3.0
- */
-function checkCurrentItemExist() {
-  if (!this[scope].current)
-    throw new RangeError(
-      "It is not possible to remove the current element. The current position is out of list bounds.",
-    );
 }
