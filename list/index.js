@@ -63,7 +63,7 @@ class RelatedList {
     if (this[scope].head === null) {
       return;
     }
-    this[scope].current = this[scope].head;
+    this[scope].current = this[scope].initialElement(this[scope]);
     return this.current;
   }
 
@@ -75,7 +75,7 @@ class RelatedList {
    */
   next() {
     if (this[scope].current) {
-      this[scope].current = this[scope].current.next;
+      this[scope].current = this[scope].nextElement(this[scope].current);
       return this.current;
     } else {
       return this.head();
@@ -90,7 +90,7 @@ class RelatedList {
    */
   prev() {
     if (!this[scope].current) return;
-    this[scope].current = this[scope].current.previous;
+    this[scope].current = this[scope].prevElement(this[scope].current);
     return this.current;
   }
 
@@ -101,7 +101,7 @@ class RelatedList {
    * @since 0.2.0
    */
   isEnd() {
-    return !this[scope].current || this[scope].current.next === null;
+    return !this[scope].current || this[scope].nextElement(this[scope].current) === null;
   }
 
   /**
@@ -113,7 +113,7 @@ class RelatedList {
   isNext() {
     return (
       !!this[scope].head &&
-      (!this[scope].current || this[scope].current.next !== null)
+      (!this[scope].current || this[scope].nextElement(this[scope].current) !== null)
     );
   }
 
@@ -212,10 +212,10 @@ class RelatedList {
    * @since 0.2.0
    */
   [Symbol.iterator] = function* () {
-    let current = this[scope].head;
+    let current = this[scope].initialElement(this[scope]);
     while (current) {
       yield current.content;
-      current = current.next;
+      current = this[scope].nextElement(current);
     }
   };
 

@@ -207,3 +207,13 @@ itemList.add('4');
 console.log('itemList', itemList.toArray()) // ['1', '2', '3', '4']
 console.log('newItemList', newItemList.toArray()) // ['1', '2', '3']
 ```
+
+### Обратная последовательность
+
+При необходимости, последовательность обхода списка может быть изменена на противоположную. В таком случае первым рассматривается последний элемент, а дальнейший обход осуществляется путём перебора всех элементов в обратном порядке.
+
+```js
+const RelatedList = require("related-list");
+const itemList = new RelatedList({reverseDirection: true});
+itemList.add('1', '2', '3');
+```
