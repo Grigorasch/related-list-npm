@@ -1,9 +1,26 @@
 const Item = require("../item");
+// Коллекция связанных списков. Используется для хранения данных связанных списков.
 const lists = new WeakMap();
+// Коллекция элементов. Картотека связанных списков по id
+const listsId = new WeakSet();
 const loadOptions = (context, options) =>
   require("./load_options")(context, lists, options);
-
+// Символ для доступа к полю содержимого элемента
 const scope = Symbol("RelatedListScope");
+
+/**
+ * Функция проверяет, выбран ли текущий элемент.
+ *
+ * @throws {RangeError} Выбрасывается, если текущий элемент не выбран.
+ * @since 0.3.0
+ */
+function checkCurrentItemExist() {
+  if (!this[scope].current)
+    throw new RangeError(
+      "It is not possible to remove the current element. The current position is out of list bounds.",
+    );
+}
+
 /**
  * Класс представляющий связанный список.
  * @since 0.1.0
@@ -28,7 +45,7 @@ class RelatedList {
       value: lists.get(this),
       writable: false,
       enumerable: false,
-      configurable: true,
+      configurable: false,
     });
   }
 
@@ -151,46 +168,42 @@ class RelatedList {
     });
   }
 
-  // addBefore(...values) {
-  //   if (!this[scope].current)
-  //     throw new RangeError(
-  //       "It is not possible to remove the current element. The current position is out of list bounds.",
-  //     );
-  //   values.forEach((value) => {
-  //     const item = new Item(value);
-  //     item.next = this[scope].current;
-  //     if (this[scope].current.previous) {
-  //       this[scope].current.previous.next = item;
-  //       item.previous = this[scope].current.previous;
-  //     } else {
-  //       this[scope].head = item;
-  //       item
-  //     }
-  //     this[scope].current.previous = item;
-  //     this[scope].length.add();
-  //   });
-  // }
-
-  // addAfter(...values) {
-  //   if (!this[scope].current)
-  //     throw new RangeError(
-  //       "It is not possible to remove the current element. The current position is out of list bounds.",
-  //     );
-  //   values.forEach((value) => {
-  //     const item = new Item(value);
-  //     item.previous = this[scope].current;
-  //     if (this[scope].current.next) {
-  //       this[scope].current.next.previous = item;
-  //       item.next = this[scope].current.next;
-  //     } else {
-  //       this[scope].tail = item;
-  //       item
-  //     }
-  //     this[scope].current.next = item;
-  //     this[scope].length.add();
-  //   });
+  addBefore(...values) {
+    checkCurrentItemExist();
     
-  // }
+    values.forEach((value) => {
+      const item = new Item(value);
+      item.next = this[scope].current;
+      if (this[scope].current.previous) {
+        this[scope].current.previous.next = item;
+        item.previous = this[scope].current.previous;
+      } else {
+        this[scope].head = item;
+        item
+      }
+      this[scope].current.previous = item;
+      this[scope].length.add();
+    });
+  }
+
+  addAfter(...values) {
+    checkCurrentItemExist();
+
+    values.forEach((value) => {
+      const item = new Item(value);
+      item.previous = this[scope].current;
+      if (this[scope].current.next) {
+        this[scope].current.next.previous = item;
+        item.next = this[scope].current.next;
+      } else {
+        this[scope].tail = item;
+        item
+      }
+      this[scope].current.next = item;
+      this[scope].length.add();
+    });
+    
+  }
 
   /**
    * Удаляет текущий элемент из списка.
@@ -199,10 +212,8 @@ class RelatedList {
    * @since 0.2.0
    */
   remove() {
-    if (!this[scope].current)
-      throw new RangeError(
-        "It is not possible to remove the current element. The current position is out of list bounds.",
-      );
+    checkCurrentItemExist();
+    
     this[scope].length.remove();
     if (this[scope].current.next) {
       this[scope].current.next.previous = this[scope].current.previous;
