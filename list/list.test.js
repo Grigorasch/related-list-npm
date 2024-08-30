@@ -47,6 +47,69 @@ describe("Тесты класса RelatedList", () => {
       list.head();
       list.remove();
       expect(list.length).toBe(3);
+      list.head();
+      expect(list.prev()).toBeUndefined();
+      expect(list.prev()).toBeUndefined();
+      expect(list.prev()).toBeUndefined();
+    });
+    test("должен добавить элемент перед текущим и после текущего", () => {
+      const list = new RelatedList({ lengthCount: true });
+      const items = [
+        "test_content_1",
+        "test_content_2",
+        "test_content_3",
+        "test_content_4",
+        "test_content_5",
+      ];
+      list.add(...items);
+      list.head();
+      list.next();
+      list.addBefore("before");
+      list.next();
+      list.addAfter("after");
+      expect(list.length).toBe(7);
+      let result = [];
+      list.forEach((item) => result.push(item));
+      expect(result).toEqual([
+        "test_content_1",
+        "before",
+        "test_content_2",
+        "test_content_3",
+        "after",
+        "test_content_4",
+        "test_content_5",
+      ]);
+    });
+    test("должен соблюдать порядок добавления элементов", () => {
+      const list = new RelatedList({ lengthCount: true });
+      list.add("1", "2", "3");
+      list.head();
+      list.next();
+      list.addBefore("1.1", "1.2", "1.3");
+      list.addAfter("2.1", "2.2", "2.3");
+      list.next();
+      list.addBefore("2.9");
+      expect(list.length).toBe(10);
+      let result = [];
+      list.forEach((item) => result.push(item));
+      expect(result).toEqual([
+        "1",
+        "1.1",
+        "1.2",
+        "1.3",
+        "2",
+        "2.1",
+        "2.2",
+        "2.3",
+        "2.9",
+        "3",
+      ]);
+      expect(list.prev()).toBe("2.9");
+      expect(list.prev()).toBe("2.3");
+      expect(list.prev()).toBe("2.2");
+      list.head();
+      expect(list.prev()).toBeUndefined();
+      expect(list.prev()).toBeUndefined();
     });
   });
   describe("Значение текущего элемента current", () => {
@@ -173,7 +236,74 @@ describe("Тесты класса RelatedList", () => {
       const newList = list.map((item) => item * 2);
       newList.forEach((item, index) => {
         expect(item).toBe(data[index] * 2);
-      })
+      });
+    });
+    test("должен элементы списка вернуть в виде массива", () => {
+      const data = [1, 5, 8, 2, 8, 3];
+      const list = new RelatedList();
+      list.add(...data);
+      const listArray = list.toArray();
+      expect(listArray).toEqual(data);
+    });
+    test("должен вернуть копию списка", () => {
+      const data = [1, 5, 8, 2, 8, 3];
+      const list = new RelatedList({ lengthCount: true });
+      list.add(...data);
+      const newList = list.clone();
+      list.start();
+      newList.forEach((item) => {
+        expect(item).toBe(list.next());
+      });
+      expect(list.length).toBe(newList.length);
+      for (const item in list) {
+        expect(list[item]).toBe(newList[item]);
+      }
+    });
+  });
+
+  describe("проверка реверсивного режима", () => {
+    test("должны идти в обратном порядке", () => {
+      const data = ["item1", "item2", "item3", "item4", "item5"];
+      const list = new RelatedList({ reverseDirection: true });
+      expect(list.reverseDirection).toBe(true);
+      list.add(...data);
+
+      let i = 0;
+      while (!list.isEnd()) {
+        i--;
+        expect(list.next()).toBe(data[data.length + i]);
+      }
+    });
+    test("должен добавлять элементы в конец списка", ()=>{
+      const data = ["item1", "item2", "item3", "item4", "item5"];
+      const list = new RelatedList({ reverseDirection: true });
+      list.add(...data);
+      list.next();
+      list.next();
+      list.next();
+      list.add("item6", "item7");
+      expect(list.head()).toBe("item7");
+      list.start();
+      expect(list.next()).toBe("item7");
+      expect(list.next()).toBe("item6");
+      expect(list.next()).toBe("item5");
+      expect(list.next()).toBe("item4");
+      expect(list.next()).toBe("item3");
+      expect(list.next()).toBe("item2");
+      expect(list.next()).toBe("item1");
+      expect(list.next()).toBeUndefined();
+      expect(list.next()).toBe("item7");
+    });
+    test("обход должен выполнятьься в обратном порядке", () => {
+      const data = ["item1", "item2", "item3", "item4", "item5"];
+      const list = new RelatedList({ reverseDirection: true });
+      list.add(...data);
+      expect(list.toArray()).toEqual(["item5", "item4", "item3", "item2", "item1"]);
+      const result = [];
+      for (const item of list) {
+        result.push(item);
+      };
+      expect(result).toEqual(["item5", "item4", "item3", "item2", "item1"]);
     });
   });
 });

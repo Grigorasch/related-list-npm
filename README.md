@@ -44,6 +44,15 @@ console.log(itemList.next());  // undefined
 console.log(itemList.next());  // 1
 ```
 
+Returning to the previous element is done using the *prev()* method. The method moves to the previous element and returns it.
+
+```js
+console.log(itemList.next());  // 2
+console.log(itemList.prev());  // 1
+console.log(itemList.prev());  // undefined
+console.log(itemList.prev());  // undefined
+```
+
 > A linked list does not provide the sequence number of the current element, nor does it have the ability to access the elements of the list by sequence number.
 
 The *current* property provides access to the current element. The property getter returns the value of the element, and setter allows you to modify it. The *remove()* method is used to remove the current element
@@ -71,6 +80,24 @@ console.log(itemList.next());  // 2
 itemList.start();
 console.log(itemList.next());  // 1
 console.log(itemList.next());  // 2
+```
+
+To add elements to the current element, the *addBefore()* and *addAfter()* methods are used.
+
+```js
+itemList.head();  // 1
+itemList.next();  // 2
+itemList.addBefore('1.1', '1.2', '1.3');
+itemList.addAfter('2.1', '2.2', '2.3');
+// 1
+// 1.1
+// 1.2
+// 1.3
+// 2
+// 2.1
+// 2.2
+// 2.3
+// 3
 ```
 
 
@@ -158,4 +185,39 @@ const itemList = new RelatedList({ lengthCount: true });
 itemList.length  // 0
 itemList.add('1', '2', '3');
 itemList.length  // 3
+```
+
+### Converting a list to an array
+
+Any list can be represented as an array while preserving the sequence of elements. To do this, use the toArray() method
+
+```js
+const RelatedList = require("related-list");
+const itemList = new RelatedList();
+itemList.add('1', '2', '3');
+itemList.toArray();    // ['1', '2', '3']
+```
+
+### Copying a list
+
+To get a copy of the original list, use the *clone()* method.
+
+```js
+const RelatedList = require("related-list");
+const itemList = new RelatedList();
+itemList.add('1', '2', '3');
+const newItemList = itemList.clone(); 
+itemList.add('4');
+console.log('itemList', itemList.toArray()) // ['1', '2', '3', '4']
+console.log('newItemList', newItemList.toArray()) // ['1', '2', '3']
+```
+
+### Reverse sequence
+
+If necessary, the sequence of list traversal can be reversed. In this case, the last element is considered first, and further traversal is performed by searching all elements in reverse order.
+
+```js
+const RelatedList = require("related-list");
+const itemList = new RelatedList({reverseDirection: true});
+itemList.add('1', '2', '3');
 ```

@@ -1,11 +1,11 @@
 {
   "name": "related-list",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "description": "The module provides a data structure such as a linked list for JavaScript projects",
   "main": "index.js",
   "scripts": {
     "run": "node index.js",
-    "test": "jest",
+    "test": "jest list/list.test.js",
     "docs": "jsdoc -c .conf"
   },
   "repository": {

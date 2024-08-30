@@ -40,6 +40,15 @@ console.log(itemList.next());  // undefined
 console.log(itemList.next());  // 1
 ```
 
+Возврат к предыдущему элементу осуществляется при помощи метода prev(). Метод переходит к предыдущему элементу и возвращает его.
+
+```js
+console.log(itemList.next());  // 2
+console.log(itemList.prev());  // 1
+console.log(itemList.prev());  // undefined
+console.log(itemList.prev());  // undefined
+```
+
 > Связанный список не предоставляет порядковый номер текущего элемента, а также не имеет возможности обращаться по порядковому номеру к элементам списка.
 
 Свойство *current* предоставляет доступ к текущему элементу. Getter свойства возвращает значение элемента, а setter позволяет его изменить. Для удаления текущего элемента используется метод *remove()*
@@ -68,6 +77,24 @@ console.log(itemList.next());  // 2
 itemList.start();
 console.log(itemList.next());  // 1
 console.log(itemList.next());  // 2
+```
+
+Для добавления элементов у текущего элемента, исполльзуются методы *addBefore()* и *addAfter()*
+
+```js
+itemList.head();  // 1
+itemList.next();  // 2
+itemList.addBefore('1.1', '1.2', '1.3');
+itemList.addAfter('2.1', '2.2', '2.3');
+// 1
+// 1.1
+// 1.2
+// 1.3
+// 2
+// 2.1
+// 2.2
+// 2.3
+// 3
 ```
 
 
@@ -154,4 +181,39 @@ const itemList = new RelatedList({ lengthCount: true });
 itemList.length  // 0
 itemList.add('1', '2', '3');
 itemList.length  // 3
+```
+
+### Преобразование списка в массив
+
+Любой список может быть представлен в виде массива с сохранением последовательности элементов. Для этого используйте метод toArray()
+
+```js
+const RelatedList = require("related-list");
+const itemList = new RelatedList();
+itemList.add('1', '2', '3');
+itemList.toArray();    // ['1', '2', '3']
+```
+
+### Копирование списка
+
+Для получения копии исходного списка используйте метод *clone()*
+
+```js
+const RelatedList = require("related-list");
+const itemList = new RelatedList();
+itemList.add('1', '2', '3');
+const newItemList = itemList.clone(); 
+itemList.add('4');
+console.log('itemList', itemList.toArray()) // ['1', '2', '3', '4']
+console.log('newItemList', newItemList.toArray()) // ['1', '2', '3']
+```
+
+### Обратная последовательность
+
+При необходимости, последовательность обхода списка может быть изменена на противоположную. В таком случае первым рассматривается последний элемент, а дальнейший обход осуществляется путём перебора всех элементов в обратном порядке.
+
+```js
+const RelatedList = require("related-list");
+const itemList = new RelatedList({reverseDirection: true});
+itemList.add('1', '2', '3');
 ```

@@ -1,9 +1,12 @@
 const Item = require("../item");
+// Коллекция связанных списков. Используется для хранения данных связанных списков.
 const lists = new WeakMap();
+
 const loadOptions = (context, options) =>
   require("./load_options")(context, lists, options);
+// Символ для доступа к полю содержимого элемента
+const scope = Symbol("RelatedListScope");
 
-const scope = Symbol('RelatedListScope');
 /**
  * Класс представляющий связанный список.
  * @since 0.1.0
@@ -28,12 +31,18 @@ class RelatedList {
       value: lists.get(this),
       writable: false,
       enumerable: false,
-      configurable: true,
+      configurable: false,
     });
   }
 
+  /**
+   * Возвращает количество элементов в списке.
+   * @type {number}
+   * @readonly
+   * @since 0.2.0
+   */
   get length() {
-    return this[scope].length()  // lists.get(this).length();
+    return this[scope].length();
   }
 
   /**
@@ -54,7 +63,7 @@ class RelatedList {
     if (this[scope].head === null) {
       return;
     }
-    this[scope].current = this[scope].head;
+    this[scope].current = this[scope].initialElement(this[scope]);
     return this.current;
   }
 
@@ -66,11 +75,23 @@ class RelatedList {
    */
   next() {
     if (this[scope].current) {
-      this[scope].current = this[scope].current.next;
+      this[scope].current = this[scope].nextElement(this[scope].current);
       return this.current;
     } else {
       return this.head();
     }
+  }
+
+  /**
+   * Перемещает текущую позицию к предыдущему элементу и возвращает его.
+   *
+   * @returns {Item} - Предыдущий элемент в списке, или undefined, если текущий элемент является первым элементом.
+   * @since 0.3.0
+   */
+  prev() {
+    if (!this[scope].current) return;
+    this[scope].current = this[scope].prevElement(this[scope].current);
+    return this.current;
   }
 
   /**
@@ -80,7 +101,7 @@ class RelatedList {
    * @since 0.2.0
    */
   isEnd() {
-    return !this[scope].current || this[scope].current.next === null;
+    return !this[scope].current || this[scope].nextElement(this[scope].current) === null;
   }
 
   /**
@@ -90,7 +111,10 @@ class RelatedList {
    * @since 0.2.0
    */
   isNext() {
-    return !!this[scope].head && (!this[scope].current || this[scope].current.next !== null);
+    return (
+      !!this[scope].head &&
+      (!this[scope].current || this[scope].nextElement(this[scope].current) !== null)
+    );
   }
 
   isEmpty() {
@@ -104,10 +128,7 @@ class RelatedList {
    * @since 0.2.0
    */
   set current(value) {
-    if (!this[scope].current)
-      throw new RangeError(
-        "It is not possible to change the current element. The end of the list has been reached",
-      );
+    this._checkCurrentItemExist();
     this[scope].current.content = value;
   }
 
@@ -123,23 +144,42 @@ class RelatedList {
 
   /**
    * Добавляет новые элементы в конец списка.
-   * @param {...any} values - Значения для добавления в список.
+   * @param {...any} values - Элементы для добавления в список.
    * @returns {void}
    * @since 0.1.0
    * @version 0.2.0
    */
   add(...values) {
-    values.forEach(value => {
-      const item = new Item(value);
-      if (this[scope].tail) {
-        this[scope].tail.next = item;
-        item.previous = this[scope].tail;
-      } else {
-        this[scope].head = item;
-      }
-      this[scope].tail = item;
-      this[scope].length.add()
-    });
+    // Для каждого элемента используется стратегия добавления в конец списка
+    values.forEach(addElementByStrategy(addToEnd, this));
+  }
+
+  /**
+   * Добавляет новые элементы перед текущим элементом.
+   * @param {...any} values - Элементы для добавления в список.
+   * @throws {RangeError} Выбрасывается, если текущая позиция за пределами списка.
+   * @returns {void}
+   * @since 0.3.0
+   */
+  addBefore(...values) {
+    // Проверка что current элемент выбран
+    this._checkCurrentItemExist();
+    // Для каждого элемента используется стратегия добавления перед текущим элементом
+    values.forEach(addElementByStrategy(addToBefore, this));
+  }
+
+  /**
+   * Добавляет новые элементы после текущего элемента.
+   * @param {...any} values - Элементы для добавления в список.
+   * @throws {RangeError} Выбрасывается, если текущая позиция за пределами списка.
+   * @returns {void}
+   * @since 0.3.0
+   */
+  addAfter(...values) {
+    // Проверка что current элемент выбран
+    this._checkCurrentItemExist();
+    // Для каждого элемента используется стратегия добавления после текущего элемента
+    values.forEach(addElementByStrategy(addToAfter, this));
   }
 
   /**
@@ -149,11 +189,9 @@ class RelatedList {
    * @since 0.2.0
    */
   remove() {
-    if (!this[scope].current)
-      throw new RangeError(
-        "It is not possible to remove the current element. The current position is out of list bounds.",
-      );
-this[scope].length.remove();
+    this._checkCurrentItemExist();
+
+    this[scope].length.remove();
     if (this[scope].current.next) {
       this[scope].current.next.previous = this[scope].current.previous;
     } else {
@@ -174,12 +212,12 @@ this[scope].length.remove();
    * @since 0.2.0
    */
   [Symbol.iterator] = function* () {
-    let current = this[scope].head;
+    let current = this[scope].initialElement(this[scope]);
     while (current) {
       yield current.content;
-      current = current.next;
+      current = this[scope].nextElement(current);
     }
-  }
+  };
 
   /**
    * Применяет указанную функцию к каждому элементу списка и возвращает новый список с результатами вызова этой функции.
@@ -190,13 +228,14 @@ this[scope].length.remove();
    * @returns {RelatedList} Новый список с результатами вызова `callback`.
    * @since 0.2.0
    */
-  map(callback, thisArg={}) {
-    if (typeof callback !== 'function') throw new TypeError('callback is not a function');
+  map(callback, thisArg = {}) {
+    if (typeof callback !== "function")
+      throw new TypeError("callback is not a function");
     const result = new RelatedList();
     const iterator = this[Symbol.iterator]();
-    let index = 0
+    let index = 0;
     while (true) {
-      const item = iterator.next()
+      const item = iterator.next();
       if (item.done) break;
       result.add(callback.call(thisArg, item.value, index, this));
       index++;
@@ -213,17 +252,156 @@ this[scope].length.remove();
    * @returns {void}
    * @since 0.2.0
    */
-  forEach(callback, thisArg={}) {
-    if (typeof callback !== 'function') throw new TypeError('callback is not a function');
+  forEach(callback, thisArg = {}) {
+    if (typeof callback !== "function")
+      throw new TypeError("callback is not a function");
     const iterator = this[Symbol.iterator]();
-    let index = 0
+    let index = 0;
     while (true) {
-      const item = iterator.next()
+      const item = iterator.next();
       if (item.done) break;
       callback.call(thisArg, item.value, index, this);
       index++;
     }
   }
+
+  /**
+   * Преобразует связанный список в массив.
+   *
+   * @returns {Array<any>} Массив, содержащий элементы связанного списка.
+   * @since 0.3.0
+   */
+  toArray() {
+    const array = [];
+    if (this.isEmpty()) return array;
+
+    const iterator = this[Symbol.iterator]();
+    while (true) {
+      const item = iterator.next();
+      if (item.done) break;
+      array.push(item.value);
+    }
+
+    return array;
+  }
+
+  /**
+   * Создает копию связанного списка.
+   *
+   * @returns {RelatedList} - Копия связанного списка.
+   * @since 0.3.0
+   */
+  clone() {
+    const options = getOptions(this);
+    const list = new RelatedList(options);
+
+    const iterator = this[Symbol.iterator]();
+    while (true) {
+      const item = iterator.next();
+      if (item.done) break;
+      list.add(item.value);
+    }
+    return list;
+  }
+
+  /**
+   * Функция проверяет, выбран ли текущий элемент.
+   * @private
+   *
+   * @throws {RangeError} Выбрасывается, если текущий элемент не выбран.
+   * @since 0.3.0
+   */
+  _checkCurrentItemExist() {
+    if (!this[scope].current)
+      throw new RangeError(
+        "It is not possible to remove the current element. The current position is out of list bounds.",
+      );
+  }
 }
 
 module.exports = RelatedList;
+
+/**
+ * Создает функцию, которая добавляет элемент в список по заданной стратегии.
+ * Полученная функция используется для перебора элементов массива.
+ *
+ * @param {function(Item)} strategy - Функция, определяющая стратегию добавления элемента.
+ * @returns {function(any)} - Функция, которая добавляет элемент в список.
+ * @since 0.3.0
+ */
+function addElementByStrategy(strategy, context) {
+  return (value) => {
+    const item = new Item(value);
+    // strategy(item);
+    strategy.call(context, item);
+    context[scope].length.add();
+  };
+}
+
+/**
+ * Стратегия действий для добавления элемента в конец списка
+ *
+ * @param {Item} item - Элемент, который нужно добавить в конец списка.
+ * @since 0.3.0
+ */
+function addToEnd(item) {
+  if (this[scope].tail) {
+    this[scope].tail.next = item;
+    item.previous = this[scope].tail;
+  } else {
+    this[scope].head = item;
+  }
+  this[scope].tail = item;
+}
+
+/**
+ * Стратегия действий для добавления элемента перед текущим
+ *
+ * @param {Item} item - Элемент, который нужно добавить в список перед текущим элементом.
+ * @since 0.3.0
+ */
+function addToBefore(item) {
+  item.next = this[scope].current;
+  if (this[scope].current.previous) {
+    this[scope].current.previous.next = item;
+    item.previous = this[scope].current.previous;
+  } else {
+    this[scope].head = item;
+    item;
+  }
+  this[scope].current.previous = item;
+}
+
+/**
+ * Стратегия действий для добавления элемента после текущего
+ *
+ * @param {Item} item - Элемент, который нужно добавить в список после текущего элемента.
+ * @since 0.3.0
+ */
+function addToAfter(item) {
+  item.previous = this[scope].current;
+  if (this[scope].current.next) {
+    this[scope].current.next.previous = item;
+    item.next = this[scope].current.next;
+  } else {
+    this[scope].tail = item;
+    item;
+  }
+  this[scope].current.next = item;
+  this.next();
+}
+
+/**
+ * Возвращает объект опций для заданного списка
+ *
+ * @param {RelatedList} list - Исходный список, из которого извлекаются опции.
+ * @returns {Object} - Объект опций списка
+ * @since 0.3.0
+ */
+function getOptions(list) {
+  const options = {};
+  for (const option in list) {
+    options[option] = list[option];
+  }
+  return options;
+}
