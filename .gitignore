@@ -136,3 +136,5 @@ replit.nix
 *.breakpoints
 docs
 .vscode
+.upm
+.local
