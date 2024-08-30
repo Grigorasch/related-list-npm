@@ -193,3 +193,17 @@ const itemList = new RelatedList();
 itemList.add('1', '2', '3');
 itemList.toArray();    // ['1', '2', '3']
 ```
+
+### Копирование списка
+
+Для получения копии исходного списка используйте метод *clone()*
+
+```js
+const RelatedList = require("related-list");
+const itemList = new RelatedList();
+itemList.add('1', '2', '3');
+const newItemList = itemList.clone(); 
+itemList.add('4');
+console.log('itemList', itemList.toArray()) // ['1', '2', '3', '4']
+console.log('newItemList', newItemList.toArray()) // ['1', '2', '3']
+```
