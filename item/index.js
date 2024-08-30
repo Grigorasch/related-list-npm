@@ -1,5 +1,14 @@
 /**
- * Представляет элемент в связном списке.
+ * Набор параметров Item.
+ *
+ * @interface ItemOptions
+ * @property {Item} [next] - Ссылка на следующее звено списка.
+ * @property {Item} [previous] - Ссылка на предыдущее звено списка.
+ * @since 0.3.1
+ */
+
+/**
+ * Звено связанного списка. Используется для хранения полезной нагрузки и ссылок на соседние элементы.
  *
  * @class
  * @since 0.1.0
@@ -7,37 +16,36 @@
  */
 class Item {
   /**
-   * Создаёт экземпляр Item.
    *
-   * @param {string} [content] - Содержимое элемента.
-   * @param {object} [option] - Опции для элемента (не используется в текущей реализации).
+   * @param {any} [content] - Полезная нагрузка, которая будет храниться в этом звене списка.
+   * @param {ItemOptions} [option] - Дополнительные параметры для настройки звена списка.
    * @since 0.1.0
    * @version 0.2.0
    */
   constructor(content, option = {}) {
     const { next, previous } = option;
-    this.content = content;
-    this.next = next;
-    this.previous = previous;
+    this.content = content ?? null;
+    this.next = next ?? null;
+    this.previous = previous ?? null;
   }
 
   /**
-   * Устанавливает следующий элемент в списке.
+   * Устанавливает ссылку на следующее звено списка.
    *
-   * @param {Item|null} next - Следующий элемент. Если передано значение undefinded, то содержимое элемента будет удалено.
-   * @throws {TypeError} Если next не является экземпляром Item.
+   * @param {Item|null} next - Ссылка на следующее звено
+   * @throws {TypeError} Если next не является экземпляром Item или null.
    * @since 0.1.0
+   * @version 0.3.1
    */
-  set next(next = null) {
-    if (next && !(next instanceof Item))
-      throw new TypeError("Next item must be an instance of Item");
+  set next(next) {
+    this._assertIsItem(next);
     this._next = next;
   }
 
   /**
-   * Возвращает следующий элемент в списке.
+   * Возвращает ссылку на следующее звено в списке.
    *
-   * @returns {*} Следующий элемент или null.
+   * @returns {Item|null} Ссылка на следующее звено. Для последнего звена функция вернет null.
    * @since 0.1.0
    */
   get next() {
@@ -45,47 +53,60 @@ class Item {
   }
 
   /**
-   * Устанавливает предыдущий элемент в списке.
+   * Устанавливает ссылку на предыдущее звено в списке.
    *
-   * @param {Item|null} previous - Предыдущий элемент. Если передано значение undefinded, то содержимое элемента будет удалено.
-   * @throws {TypeError} Если previous не является экземпляром Item.
+   * @param {Item|null} previous - Ссылка на предыдущее звено
+   * @throws {TypeError} Если previous не является ни экземпляром Item ни null.
    * @since 0.2.0
    */
-  set previous(previous = null) {
-    if (previous && !(previous instanceof Item))
-      throw new TypeError("Previous item must be an instance of Item");
+  set previous(previous) {
+    this._assertIsItem(previous);
     this._previous = previous;
   }
 
   /**
-   * Возвращает предыдущий элемент в списке.
+   * Возвращает ссылку на предыдущее звено в списке.
    *
-   * @returns {*} Предыдущий элемент. Для первого элемента в списке или при отсутсвии предыдущего элемента возвращае null.
+   * @returns {Item|null} Ссылка на предыдущее звено. Для первого звена списка или при отсутствии предыдущего элемента функция вернет null.
    * @since 0.2.0
+   * @version 0.3.1
    */
   get previous() {
     return this._previous;
   }
 
   /**
-   * Устанавливает содержимое элемента.
+   * Устанавливает содержимое звена.
    *
-   * @param {*} content - Новое содержимое элемента. Если передано значение undefinded, то содержимое элемента будет удалено.
+   * @param {any} content - Новое содержимое звена. Undefined будет записано как null.
    * @since 0.1.0
+   * @version 0.3.1
    */
-  set content(content = null) {
-    this._content = content;
+  set content(content) {
+    this._content = content ?? null;
   }
 
   /**
-   * Возвращает содержимое элемента.
+   * Возвращает содержимое звена.
    *
-   * @returns {*} Содержимое элемента. Пустой элемент возвращает null.
+   * @returns {any} Содержимое звена. Пустое звено возвращает null.
    * @since 0.1.0
    */
   get content() {
     return this._content;
   }
+
+  /**
+   * Метод проверяет принадлежность аргумента к Item или null
+   * @private
+   * @param {any} obj - Проверяемый параметр
+   * @throws {TypeError} Переданный аргумент не принадлежит к Item или null.
+   * @since 0.3.1
+   */
+  _assertIsItem(obj) {
+    if (obj !== null && !(obj instanceof Item)) throw new TypeError('Expected an item to be an Item or null');
+  }
 }
 
 module.exports = Item;
+
