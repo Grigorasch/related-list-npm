@@ -266,6 +266,26 @@ class RelatedList {
   }
 
   /**
+   * Преобразует связанный список в массив.
+   *
+   * @returns {Array<any>} Массив, содержащий элементы связанного списка.
+   * @since 0.3.0
+   */
+  toArray() {
+    const array = [];
+    if (this.isEmpty()) return array;
+    
+    const iterator = this[Symbol.iterator]();
+    while (true) {
+      const item = iterator.next();
+      if (item.done) break;
+      array.push(item.value);
+    }
+
+    return array;
+  }
+
+  /**
    * Функция проверяет, выбран ли текущий элемент.
    * @private
    *

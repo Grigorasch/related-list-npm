@@ -238,5 +238,12 @@ describe("Тесты класса RelatedList", () => {
         expect(item).toBe(data[index] * 2);
       });
     });
+    test("должен элементы списка вернуть в виде массива", () => {
+      const data = [1, 5, 8, 2, 8, 3];
+      const list = new RelatedList();
+      list.add(...data);
+      const listArray = list.toArray();
+      expect(listArray).toEqual(data);
+    });
   });
 });

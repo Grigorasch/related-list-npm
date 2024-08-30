@@ -186,3 +186,14 @@ itemList.length  // 0
 itemList.add('1', '2', '3');
 itemList.length  // 3
 ```
+
+### Converting a list to an array
+
+Any list can be represented as an array while preserving the sequence of elements. To do this, use the toArray() method
+
+```js
+const RelatedList = require("related-list");
+const itemList = new RelatedList();
+itemList.add('1', '2', '3');
+itemList.toArray();    // ['1', '2', '3']
+```
