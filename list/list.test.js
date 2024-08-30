@@ -47,6 +47,10 @@ describe("Тесты класса RelatedList", () => {
       list.head();
       list.remove();
       expect(list.length).toBe(3);
+      list.head();
+      expect(list.prev()).toBeUndefined();
+      expect(list.prev()).toBeUndefined();
+      expect(list.prev()).toBeUndefined();
     });
     test("должен добавить элемент перед текущим и после текущего", () => {
       const list = new RelatedList({ lengthCount: true });
@@ -100,6 +104,12 @@ describe("Тесты класса RelatedList", () => {
         "2.9",
         "3",
       ]);
+      expect(list.prev()).toBe("2.9");
+      expect(list.prev()).toBe("2.3");
+      expect(list.prev()).toBe("2.2");
+      list.head();
+      expect(list.prev()).toBeUndefined();
+      expect(list.prev()).toBeUndefined();
     });
   });
   describe("Значение текущего элемента current", () => {
