@@ -238,5 +238,26 @@ describe("Тесты класса RelatedList", () => {
         expect(item).toBe(data[index] * 2);
       });
     });
+    test("должен элементы списка вернуть в виде массива", () => {
+      const data = [1, 5, 8, 2, 8, 3];
+      const list = new RelatedList();
+      list.add(...data);
+      const listArray = list.toArray();
+      expect(listArray).toEqual(data);
+    });
+    test("должен вернуть копию списка", () => {
+      const data = [1, 5, 8, 2, 8, 3];
+      const list = new RelatedList({ lengthCount: true });
+      list.add(...data);
+      const newList = list.clone();
+      list.start();
+      newList.forEach((item) => {
+        expect(item).toBe(list.next());
+      });
+      expect(list.length).toBe(newList.length);
+      for (const item in list) {
+        expect(list[item]).toBe(newList[item]);
+      }
+    });
   });
 });

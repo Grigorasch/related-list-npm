@@ -266,6 +266,45 @@ class RelatedList {
   }
 
   /**
+   * Преобразует связанный список в массив.
+   *
+   * @returns {Array<any>} Массив, содержащий элементы связанного списка.
+   * @since 0.3.0
+   */
+  toArray() {
+    const array = [];
+    if (this.isEmpty()) return array;
+
+    const iterator = this[Symbol.iterator]();
+    while (true) {
+      const item = iterator.next();
+      if (item.done) break;
+      array.push(item.value);
+    }
+
+    return array;
+  }
+
+  /**
+   * Создает копию связанного списка.
+   *
+   * @returns {RelatedList} - Копия связанного списка.
+   * @since 0.3.0
+   */
+  clone() {
+    const options = getOptions(this);
+    const list = new RelatedList(options);
+
+    const iterator = this[Symbol.iterator]();
+    while (true) {
+      const item = iterator.next();
+      if (item.done) break;
+      list.add(item.value);
+    }
+    return list;
+  }
+
+  /**
    * Функция проверяет, выбран ли текущий элемент.
    * @private
    *
@@ -350,4 +389,19 @@ function addToAfter(item) {
   }
   this[scope].current.next = item;
   this.next();
+}
+
+/**
+ * Возвращает объект опций для заданного списка
+ *
+ * @param {RelatedList} list - Исходный список, из которого извлекаются опции.
+ * @returns {Object} - Объект опций списка
+ * @since 0.3.0
+ */
+function getOptions(list) {
+  const options = {};
+  for (const option in list) {
+    options[option] = list[option];
+  }
+  return options;
 }

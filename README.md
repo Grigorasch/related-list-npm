@@ -186,3 +186,28 @@ itemList.length  // 0
 itemList.add('1', '2', '3');
 itemList.length  // 3
 ```
+
+### Converting a list to an array
+
+Any list can be represented as an array while preserving the sequence of elements. To do this, use the toArray() method
+
+```js
+const RelatedList = require("related-list");
+const itemList = new RelatedList();
+itemList.add('1', '2', '3');
+itemList.toArray();    // ['1', '2', '3']
+```
+
+### Copying a list
+
+To get a copy of the original list, use the *clone()* method.
+
+```js
+const RelatedList = require("related-list");
+const itemList = new RelatedList();
+itemList.add('1', '2', '3');
+const newItemList = itemList.clone(); 
+itemList.add('4');
+console.log('itemList', itemList.toArray()) // ['1', '2', '3', '4']
+console.log('newItemList', newItemList.toArray()) // ['1', '2', '3']
+```
