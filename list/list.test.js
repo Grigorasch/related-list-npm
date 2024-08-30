@@ -48,6 +48,34 @@ describe("Тесты класса RelatedList", () => {
       list.remove();
       expect(list.length).toBe(3);
     });
+    test("должен добавить элемент перед текущим и после текущего", () => {
+      const list = new RelatedList({ lengthCount: true });
+      const items = [
+        "test_content_1",
+        "test_content_2",
+        "test_content_3",
+        "test_content_4",
+        "test_content_5",
+      ];
+      list.add(...items);
+      list.head();
+      list.next();
+      list.addBefore("before");
+      list.next();
+      list.addAfter("after");
+      expect(list.length).toBe(7);
+      let result = [];
+      list.forEach((item) => result.push(item));
+      expect(result).toEqual([
+        "test_content_1",
+        "before",
+        "test_content_2",
+        "test_content_3",
+        "after",
+        "test_content_4",
+        "test_content_5",
+      ]);
+    });
   });
   describe("Значение текущего элемента current", () => {
     test("должен получить его значение и присвоить новое", () => {
@@ -173,7 +201,7 @@ describe("Тесты класса RelatedList", () => {
       const newList = list.map((item) => item * 2);
       newList.forEach((item, index) => {
         expect(item).toBe(data[index] * 2);
-      })
+      });
     });
   });
 });
