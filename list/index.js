@@ -9,19 +9,6 @@ const loadOptions = (context, options) =>
 const scope = Symbol("RelatedListScope");
 
 /**
- * Функция проверяет, выбран ли текущий элемент.
- *
- * @throws {RangeError} Выбрасывается, если текущий элемент не выбран.
- * @since 0.3.0
- */
-function checkCurrentItemExist() {
-  if (!this[scope].current)
-    throw new RangeError(
-      "It is not possible to remove the current element. The current position is out of list bounds.",
-    );
-}
-
-/**
  * Класс представляющий связанный список.
  * @since 0.1.0
  */
@@ -149,60 +136,42 @@ class RelatedList {
 
   /**
    * Добавляет новые элементы в конец списка.
-   * @param {...any} values - Значения для добавления в список.
+   * @param {...any} values - Элементы для добавления в список.
    * @returns {void}
    * @since 0.1.0
    * @version 0.2.0
    */
   add(...values) {
-    values.forEach((value) => {
-      const item = new Item(value);
-      if (this[scope].tail) {
-        this[scope].tail.next = item;
-        item.previous = this[scope].tail;
-      } else {
-        this[scope].head = item;
-      }
-      this[scope].tail = item;
-      this[scope].length.add();
-    });
+    // Для каждого элемента используется стратегия добавления в конец списка 
+    values.forEach(addElementByStrategy(addToEnd));
   }
 
+  /**
+   * Добавляет новые элементы перед текущим элементом.
+   * @param {...any} values - Элементы для добавления в список.
+   * @throws {RangeError} Выбрасывается, если текущая позиция за пределами списка.
+   * @returns {void}
+   * @since 0.3.0
+   */
   addBefore(...values) {
+    // Проверка что current элемент выбран
     checkCurrentItemExist();
-    
-    values.forEach((value) => {
-      const item = new Item(value);
-      item.next = this[scope].current;
-      if (this[scope].current.previous) {
-        this[scope].current.previous.next = item;
-        item.previous = this[scope].current.previous;
-      } else {
-        this[scope].head = item;
-        item
-      }
-      this[scope].current.previous = item;
-      this[scope].length.add();
-    });
+    // Для каждого элемента используется стратегия добавления перед текущим элементом 
+    values.forEach(addElementByStrategy(addToBefore));
   }
 
+  /**
+   * Добавляет новые элементы после текущего элемента.
+   * @param {...any} values - Элементы для добавления в список.
+   * @throws {RangeError} Выбрасывается, если текущая позиция за пределами списка.
+   * @returns {void}
+   * @since 0.3.0
+   */
   addAfter(...values) {
-    checkCurrentItemExist();
-
-    values.forEach((value) => {
-      const item = new Item(value);
-      item.previous = this[scope].current;
-      if (this[scope].current.next) {
-        this[scope].current.next.previous = item;
-        item.next = this[scope].current.next;
-      } else {
-        this[scope].tail = item;
-        item
-      }
-      this[scope].current.next = item;
-      this[scope].length.add();
-    });
-    
+    // Проверка что current элемент выбран
+checkCurrentItemExist();
+    // Для каждого элемента используется стратегия добавления после текущего элемента
+    values.forEach(addElementByStrategy(addToAfter));
   }
 
   /**
@@ -213,7 +182,7 @@ class RelatedList {
    */
   remove() {
     checkCurrentItemExist();
-    
+
     this[scope].length.remove();
     if (this[scope].current.next) {
       this[scope].current.next.previous = this[scope].current.previous;
@@ -290,3 +259,85 @@ class RelatedList {
 }
 
 module.exports = RelatedList;
+
+
+/**
+ * Создает функцию, которая добавляет элемент в список по заданной стратегии.
+ * Полученная функция используется для перебора элементов массива.
+ *
+ * @param {function(Item)} strategy - Функция, определяющая стратегию добавления элемента.
+ * @returns {function(any)} - Функция, которая добавляет элемент в список.
+ * @since 0.3.0
+ */
+function addElementByStrategy(strategy) {
+  return (value) => {
+    const item = new Item(value);
+      strategy(item);
+    this[scope].length.add();
+  }
+}
+
+/**
+ * Стратегия действий для добавления элемента в конец списка
+ *
+ * @param {Item} item - Элемент, который нужно добавить в конец списка.
+ * @since 0.3.0
+ */
+function addToEnd(item) {
+  if (this[scope].tail) {
+    this[scope].tail.next = item;
+    item.previous = this[scope].tail;
+  } else {
+    this[scope].head = item;
+  }
+  this[scope].tail = item;
+}
+
+/**
+ * Стратегия действий для добавления элемента перед текущим
+ *
+ * @param {Item} item - Элемент, который нужно добавить в список перед текущим элементом.
+ * @since 0.3.0
+ */
+function addToBefore(item) {
+  item.next = this[scope].current;
+  if (this[scope].current.previous) {
+    this[scope].current.previous.next = item;
+    item.previous = this[scope].current.previous;
+  } else {
+    this[scope].head = item;
+    item;
+  }
+  this[scope].current.previous = item;
+}
+
+/**
+ * Стратегия действий для добавления элемента после текущего
+ *
+ * @param {Item} item - Элемент, который нужно добавить в список после текущего элемента.
+ * @since 0.3.0
+ */
+function addToAfter(item) {
+  item.previous = this[scope].current;
+  if (this[scope].current.next) {
+    this[scope].current.next.previous = item;
+    item.next = this[scope].current.next;
+  } else {
+    this[scope].tail = item;
+    item;
+  }
+  this[scope].current.next = item;
+}
+
+/**
+ * Функция проверяет, выбран ли текущий элемент.
+ *
+ * @throws {RangeError} Выбрасывается, если текущий элемент не выбран.
+ * @since 0.3.0
+ */
+function checkCurrentItemExist() {
+  if (!this[scope].current)
+    throw new RangeError(
+      "It is not possible to remove the current element. The current position is out of list bounds.",
+    );
+}
