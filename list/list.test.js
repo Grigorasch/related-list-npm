@@ -76,6 +76,31 @@ describe("Тесты класса RelatedList", () => {
         "test_content_5",
       ]);
     });
+    test("должен соблюдать порядок добавления элементов", () => {
+      const list = new RelatedList({ lengthCount: true });
+      list.add("1", "2", "3");
+      list.head();
+      list.next();
+      list.addBefore("1.1", "1.2", "1.3");
+      list.addAfter("2.1", "2.2", "2.3");
+      list.next();
+      list.addBefore("2.9");
+      expect(list.length).toBe(10);
+      let result = [];
+      list.forEach((item) => result.push(item));
+      expect(result).toEqual([
+        "1",
+        "1.1",
+        "1.2",
+        "1.3",
+        "2",
+        "2.1",
+        "2.2",
+        "2.3",
+        "2.9",
+        "3",
+      ]);
+    });
   });
   describe("Значение текущего элемента current", () => {
     test("должен получить его значение и присвоить новое", () => {
