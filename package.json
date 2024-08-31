@@ -6,7 +6,7 @@
   "scripts": {
     "run": "node index.js",
     "test": "jest list/list.test.js",
-    "docs": "jsdoc -c .conf"
+    "docs": "jsdoc -c .conf --private"
   },
   "repository": {
     "type": "git",
