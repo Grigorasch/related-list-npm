@@ -8,6 +8,8 @@ const loadOptions = (context, options) =>
 const scope = Symbol("RelatedListScope");
 
 /**
+ * //TODO  Посмотреть способы описания класса
+ *
  * Класс представляющий связанный список.
  * @since 0.1.0
  */
@@ -24,7 +26,7 @@ class RelatedList {
       current: null,
     };
     lists.set(this, props);
-
+//TODO Пересмотреть паттерн стратегия
     loadOptions(this, options);
 
     Object.defineProperty(this, scope, {
@@ -85,7 +87,7 @@ class RelatedList {
   /**
    * Перемещает текущую позицию к предыдущему элементу и возвращает его.
    *
-   * @returns {Item} - Предыдущий элемент в списке, или undefined, если текущий элемент является первым элементом.
+   * @returns {Item|undefined} - Предыдущий элемент в списке, или undefined, если текущий элемент является первым элементом.
    * @since 0.3.0
    */
   prev() {
@@ -162,7 +164,7 @@ class RelatedList {
    * @since 0.3.0
    */
   addBefore(...values) {
-    // Проверка что current элемент выбран
+    // Проверка, что current элемент выбран
     this._checkCurrentItemExist();
     // Для каждого элемента используется стратегия добавления перед текущим элементом
     values.forEach(addElementByStrategy(addToBefore, this));
@@ -176,7 +178,7 @@ class RelatedList {
    * @since 0.3.0
    */
   addAfter(...values) {
-    // Проверка что current элемент выбран
+    // Проверка, что current элемент выбран
     this._checkCurrentItemExist();
     // Для каждого элемента используется стратегия добавления после текущего элемента
     values.forEach(addElementByStrategy(addToAfter, this));
@@ -321,11 +323,13 @@ class RelatedList {
 
 module.exports = RelatedList;
 
+//TODO Пересмотреть стратегии
 /**
  * Создает функцию, которая добавляет элемент в список по заданной стратегии.
  * Полученная функция используется для перебора элементов массива.
  *
  * @param {function(Item)} strategy - Функция, определяющая стратегию добавления элемента.
+ * @param {RelatedList} context - Экземпляр списка к которому применяется стратегия
  * @returns {function(any)} - Функция, которая добавляет элемент в список.
  * @since 0.3.0
  */
@@ -367,7 +371,7 @@ function addToBefore(item) {
     item.previous = this[scope].current.previous;
   } else {
     this[scope].head = item;
-    item;
+    // item;
   }
   this[scope].current.previous = item;
 }
@@ -385,7 +389,7 @@ function addToAfter(item) {
     item.next = this[scope].current.next;
   } else {
     this[scope].tail = item;
-    item;
+    // item;
   }
   this[scope].current.next = item;
   this.next();
