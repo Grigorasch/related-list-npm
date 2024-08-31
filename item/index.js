@@ -1,13 +1,4 @@
 /**
- * Набор параметров Item.
- *
- * @interface ItemOptions
- * @property {Item} [next] - Ссылка на следующее звено списка.
- * @property {Item} [previous] - Ссылка на предыдущее звено списка.
- * @since 0.3.1
- */
-
-/**
  * Звено связанного списка. Используется для хранения полезной нагрузки и ссылок на соседние элементы.
  *
  * @class
@@ -30,75 +21,48 @@ class Item {
   }
 
   /**
-   * Устанавливает ссылку на следующее звено списка.
-   *
-   * @param {Item|null} next - Ссылка на следующее звено
-   * @throws {TypeError} Если next не является экземпляром Item или null.
-   * @since 0.1.0
-   * @version 0.3.1
+   * Ссылка на следующее звено в списке. Возвращает *null* если значение не задано.
+   * При попытке установить значение отличное от *Item* или *null* приведет к ошибке *TypeError*
+   * @type {Item|null}
    */
   set next(next) {
     this._assertIsItem(next);
     this._next = next;
   }
 
-  /**
-   * Возвращает ссылку на следующее звено в списке.
-   *
-   * @returns {Item|null} Ссылка на следующее звено. Для последнего звена функция вернет null.
-   * @since 0.1.0
-   */
   get next() {
     return this._next;
   }
 
   /**
-   * Устанавливает ссылку на предыдущее звено в списке.
-   *
-   * @param {Item|null} previous - Ссылка на предыдущее звено
-   * @throws {TypeError} Если previous не является ни экземпляром Item ни null.
-   * @since 0.2.0
+   * Ссылка на предыдущее звено в списке. Возвращает *null* если значение не задано.
+   * При попытке установить значение отличное от *Item* или *null* приведет к ошибке *TypeError*
+   * @type {Item|null}
    */
   set previous(previous) {
     this._assertIsItem(previous);
     this._previous = previous;
   }
 
-  /**
-   * Возвращает ссылку на предыдущее звено в списке.
-   *
-   * @returns {Item|null} Ссылка на предыдущее звено. Для первого звена списка или при отсутствии предыдущего элемента функция вернет null.
-   * @since 0.2.0
-   * @version 0.3.1
-   */
   get previous() {
     return this._previous;
   }
 
   /**
-   * Устанавливает содержимое звена.
-   *
-   * @param {any} content - Новое содержимое звена. Undefined будет записано как null.
-   * @since 0.1.0
-   * @version 0.3.1
+   * Элемент хранящийся в звене списка. Возвращает *null* если значение не задано.
+   * @type {any}
    */
   set content(content) {
     this._content = content ?? null;
   }
 
-  /**
-   * Возвращает содержимое звена.
-   *
-   * @returns {any} Содержимое звена. Пустое звено возвращает null.
-   * @since 0.1.0
-   */
   get content() {
     return this._content;
   }
 
   /**
+   *  @private
    * Метод проверяет принадлежность аргумента к Item или null
-   * @private
    * @param {any} obj - Проверяемый параметр
    * @throws {TypeError} Переданный аргумент не принадлежит к Item или null.
    * @since 0.3.1
