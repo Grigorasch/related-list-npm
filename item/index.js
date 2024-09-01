@@ -1,5 +1,5 @@
 /**
- * Представляет элемент в связном списке.
+ * Звено связанного списка. Используется для хранения полезной нагрузки и ссылок на соседние элементы.
  *
  * @class
  * @since 0.1.0
@@ -7,27 +7,24 @@
  */
 class Item {
   /**
-   * Создаёт экземпляр Item.
    *
-   * @param {string} [content] - Содержимое элемента.
-   * @param {object} [option] - Опции для элемента (не используется в текущей реализации).
+   * @param {any} [content] - Полезная нагрузка, которая будет храниться в этом звене списка.
+   * @param {ItemOptions} [option] - Дополнительные параметры для настройки звена списка.
    * @since 0.1.0
    * @version 0.2.0
    */
   constructor(content, option = {}) {
     const { next, previous } = option;
-    this.content = content;
-    this.next = next;
-    this.previous = previous;
+    this.content = content ?? null;
+    this.next = next ?? null;
+    this.previous = previous ?? null;
   }
 
   /**
-   * Устанавливает следующий элемент в списке.
-   *
-   * @param {Item|null} next - Следующий элемент. Если передано значение undefined, то содержимое элемента будет удалено.
-   * @throws {TypeError} Если next не является экземпляром Item.
-   * @since 0.1.0
-   * @version 0.4.0
+   * TODO Заменить условие if на функцию валидации
+   * Ссылка на следующее звено в списке. Возвращает *null* если значение не задано.
+   * При попытке установить значение отличное от *Item* или *null* приведет к ошибке *TypeError*
+   * @type {Item|null}
    */
   set next(next) {
     if (next && !(next instanceof Item))
@@ -35,23 +32,15 @@ class Item {
     this._next = next ?? null;
   }
 
-  /**
-   * Возвращает следующий элемент в списке.
-   *
-   * @returns {any|null} Следующий элемент или null.
-   * @since 0.1.0
-   */
   get next() {
     return this._next;
   }
 
   /**
-   * Устанавливает предыдущий элемент в списке.
-   *
-   * @param {Item|null} previous - Предыдущий элемент. Если передано значение undefined, то содержимое элемента будет удалено.
-   * @throws {TypeError} Если previous не является экземпляром Item.
-   * @since 0.2.0
-   * @version 0.4.0
+   * TODO Заменить условие if на функцию валидации
+   * Ссылка на предыдущее звено в списке. Возвращает *null* если значение не задано.
+   * При попытке установить значение отличное от *Item* или *null* приведет к ошибке *TypeError*
+   * @type {Item|null}
    */
   set previous(previous) {
     if (previous && !(previous instanceof Item))
@@ -59,37 +48,33 @@ class Item {
     this._previous = previous ?? null;
   }
 
-  /**
-   * Возвращает предыдущий элемент в списке.
-   *
-   * @returns {any|null} Предыдущий элемент. Для первого элемента в списке или при отсутствии предыдущего элемента возвращаем null.
-   * @since 0.2.0
-   * @version 0.4.0
-   */
   get previous() {
     return this._previous;
   }
 
   /**
-   * Устанавливает содержимое элемента.
-   *
-   * @param {any} content - Новое содержимое элемента. Если передано значение undefined, то содержимое элемента будет удалено.
-   * @since 0.1.0
-   * @version 0.4.0
+   * Элемент хранящийся в звене списка. Возвращает *null* если значение не задано.
+   * @type {any}
    */
   set content(content) {
     this._content = content ?? null;
   }
 
-  /**
-   * Возвращает содержимое элемента.
-   *
-   * @returns {any|null} Содержимое элемента. Пустой элемент возвращает null.
-   * @since 0.1.0
-   */
   get content() {
     return this._content;
+  }
+
+  /**
+   *  @private
+   * Метод проверяет принадлежность аргумента к Item или null
+   * @param {any} obj - Проверяемый параметр
+   * @throws {TypeError} Переданный аргумент не принадлежит к Item или null.
+   * @since 0.3.1
+   */
+  _assertIsItem(obj) {
+    if (obj !== null && !(obj instanceof Item)) throw new TypeError('Expected an item to be an Item or null');
   }
 }
 
 module.exports = Item;
+
