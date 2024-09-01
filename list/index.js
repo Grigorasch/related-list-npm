@@ -1,10 +1,10 @@
-const Item = require("../item");
-const {lengthStrategies, directionStrategies} = require("./strategies");
-const {mainChains, lengthStrategy, directionStrategy} = require("./symbols");
+const Chain = require("../chain");
+const {lengthStrategies, directionStrategies} = require("../utils/strategies");
+const {mainChains, lengthStrategy, directionStrategy, head, tail, current} = require("../utils/symbols");
 
 /**
  * Объект параметров, передаваемый в конструктор списка. Позволяет включать дополнительную функциональность списка
- * @typedef {Object} RelatedList.ListOptions
+ * @typedef {Object} ChainList.ListOptions
  * @property {boolean} lengthCount=false - Флаг, указывающий, следует ли считать длину списка. Значение длины доступно через свойство length.
  * @property {boolean} reverseDirection=false - Флаг, изменяет порядок перебора элементов списка.
  * По умолчанию используется принцип FIFO: "Первым пришёл - первым ушёл" и в таком случае список перебирается с начала до конца.
@@ -15,75 +15,95 @@ const {mainChains, lengthStrategy, directionStrategy} = require("./symbols");
  * //TODO  Посмотреть способы описания класса
  *
  * Класс представляющий связанный список.
- * @since 0.1.0
- * @version 0.4.0
  */
-class RelatedList {
-    #nextChain;
-    #prevChain;
-    #headChain;
-
+class ChainList {
     /**
-     * По умолчанию, конструктор создаёт пустой объект с базовым функционалом.
-     * Чтобы добавить дополнительную функциональность списку, необходимо её включить
-     * добавив соответствующие флаги в объект [options]{@link ListOptions}
+     * По умолчанию, конструктор создаёт пустой список с базовым функционалом.
+     * В конструктор можно передать объект [options]{@link ChainList.ListOptions}
+     * чтобы добавить дополнительную функциональность списку. После создания списка, изменение
+     * параметров [options]{@link ChainList.ListOptions} невозможно.
+     * **В данной версии дополнительная функциональность отключена**
      * @constructor
      *
-     * @param {ListOptions} options - объект с флагами для включения дополнительных функций
-     * @since 0.1.0
-     * @version 0.2.0
+     * @param {ChainList.ListOptions} options - объект с флагами для включения дополнительных функций
      */
     constructor(options = {}) {
         this[head] = null;
         this[tail] = null;
         this[current] = null;
 
-        this.#readOptionsSet(options);
+        // this.#readOptionsSet(options);
     }
 
     /**
-     * Количество элементов в списке. Числовое значение доступно если в ListOptions указан флаг *lengthCount = true*.
-     * В противном случае, доступ к полю length сохраняется, его значение всегда равно *false*
-     * @type {number|false}
-     * @readonly
-     * @since 0.2.0
+     * Сообщает, достигнут ли конец списка.
+     *
+     * @returns {boolean} Возвращает true, если текущее звено является последним звеном списка
+     * или текущее звено не выбрано, иначе false.
      */
     isEnd() {
         return (this[current] === this[tail]) || !this[current] || false;
     }
 
     /**
-     * Устанавливает список в начало. Последующий вызов метода next() возвращает первый элемент списка.
-     * @since 0.2.0
+     * Сообщает, вернет ли вызов метода next() элемент списка
+     *
+     * @returns {boolean} Возвращает true, если next() вернет элемент списка; иначе false.
      */
-    start() {
-        this[mainChains].current = null;
+    isNext() {
+        return !this.isEmpty() && !!this[current].next;
     }
 
     /**
-     * Переводит текущую позицию в начало списка и возвращает первый элемент.
-     * @returns {any|undefined} Первый элемент списка или undefined, если список пуст.
-     * @since 0.1.0
-     * @version 0.4.0
+     * Сообщает о наличие звеньев в списке
+     * @returns {boolean} - true если список не содержит ни одного звена, false если в списке есть звенья
      */
-    head() {
-        if (this[mainChains].head === null) {
-            return;
-        }
-        this[mainChains].current = this.#headChain();
-        return this.current;
+    isEmpty() {
+        return !this[head];
     }
 
+    // /**
+    //  * Количество элементов в списке. Числовое значение доступно если в ListOptions указан флаг *lengthCount = true*.
+    //  * В противном случае, доступ к полю length сохраняется, его значение всегда равно *false*
+    //  * @type {number|false}
+    //  * @readonly
+    //  */
+    // get length() {
+    //     return this[lengthStrategy].length;
+    // }
+    //
+    // set length(length) {
+    //     console.warn("The Related List length of the list cannot be changed directly");
+    // }
+
+    // /**
+    //  * Устанавливает список в начало. Последующий вызов метода next() возвращает первый элемент списка.
+    //  */
+    // start() {
+    //     this[mainChains].current = null;
+    // }
+
+    // /**
+    //  * Переводит текущую позицию на первый элемент и возвращает его значение.
+    //  * @returns {any|undefined} Значение первого элемента или undefined, если список пуст.
+    //  */
+    // head() {
+    //     if (this[mainChains].head === null) {
+    //         return;
+    //     }
+    //     this[mainChains].current = this.#headChain();
+    //     return this.current;
+    // }
+
     /**
-     * Переводит текущую позицию к следующему элементу и возвращает его значение.
+     * Переводит текущую позицию к следующему звену и возвращает его значение.
      * Если достигнут конец списка, возвращает undefined и переводит текущую позицию в начало списка.
+     * Повторный вызов *next()* начнёт обход списка заново.
      * @returns {any|undefined} Следующий элемент списка или undefined, если достигнут конец списка.
-     * @since 0.1.0
-     * @version 0.4.0
      */
     next() {
-        if (this[mainChains].current) {
-            this[mainChains].current = this.#nextChain();
+        if (this[current]) {
+            this[current] = this[current].next;
             return this.current;
         } else {
             return this.head();
@@ -91,11 +111,9 @@ class RelatedList {
     }
 
     /**
-     * Перемещает текущую позицию к предыдущему элементу и возвращает его значение.
+     * Перемещает текущую позицию к предыдущему звену и возвращает его значение.
      * Если достигнуто начало списка, возвращает undefined/
-     * @returns {any|undefined} - Предыдущий элемент в списке, или undefined, если достигнуто начало списка.
-     * @since 0.3.0
-     * @version 0.4.0
+     * @returns {any|undefined} - Предыдущее звено в списке, или undefined, если достигнуто начало списка.
      */
     prev() {
         if (!this[mainChains].current) return;
@@ -103,63 +121,27 @@ class RelatedList {
         return this.current;
     }
 
-    /**
-     * Проверяет, достигнут ли конец списка.
-     *
-     * @returns {boolean} Возвращает true, если текущая позиция достигла конца списка или текущий элемент является последним; иначе false.
-     * @since 0.2.0
-     * @version 0.4.0
-     */
-    isEnd() {
-        return !this[mainChains].current || this.#nextChain() === null;
-    }
-
-    /**
-     * Проверяет, вернет ли вызов метода next() элемент списка
-     *
-     * @returns {boolean} Возвращает true, если next() вернет элемент списка; иначе false.
-     * @since 0.2.0
-     * @version 0.4.0
-     */
-    isNext() {
-        return (
-            !!this[mainChains].head &&
-            (!this[mainChains].current || this.#nextChain() !== null)
-        );
-    }
-
-    /**
-     * Проверяет наличие звеньев в списке
-     * @returns {boolean} - true если список не содержит ни одного звена, false если в списке есть звенья
-     * @since 0.2.0
-     * @version 0.4.0
-     */
-    isEmpty() {
-        return !this[mainChains].head;
-    }
 
     /**
      * Значение текущего звена. При присвоении undefined значение, оно будет записано как null.
-     * При чтении значения в начале или конце списка - будет возвращено undefined.
-     * При присвоении значения в начале или конце списка будет выброшено исключение с ошибкой *RangeError*
-     * @type {any|undefined}
+     * Если при чтении свойства, текущим не назначено ни одно звено, то будет возвращено undefined.
+     * Если при присвоении значения текущим не назначено ни одно звено, то будет выброшено исключение с ошибкой *RangeError*
+     * @type {any|null|undefined}
      */
     get current() {
-        if (!this[mainChains].current) return;
-        return this[mainChains].current.content;
+        if (!this[current]) return;
+        return this[current].content;
     }
 
     set current(value) {
-        if (!this[mainChains].current) throw new RangeError("The start or end of the list has been reached");
-        this[mainChains].current.content = value;
+        if (!this[current]) throw new RangeError("Current chain not selected");
+        this[current].content = value;
     }
 
 
     /**
-     * Добавляет новые элементы в конец списка.
-     * @param {...any} values - Элементы для добавления в список.
-     * @since 0.1.0
-     * @version 0.2.0
+     * Добавляет новые звенья в конец списка.
+     * @param {...any} values - значения для новых звеньев.
      */
     add(...values) {
         // Для каждого элемента используется стратегия добавления в конец списка
@@ -218,7 +200,7 @@ class RelatedList {
     }
 
     /**
-     * Итератор для объектов класса RelatedList.
+     * Итератор для объектов класса ChainList.
      * Позволяет перебирать элементы списка в порядке их добавления при помощи for ... of.
      * @returns {Iterator} Итератор для элементов списка.
      * @since 0.2.0
@@ -233,17 +215,17 @@ class RelatedList {
 
     /**
      * Применяет указанную функцию к каждому элементу списка и возвращает новый список с результатами вызова этой функции.
-     * @param {function(any, number, RelatedList): any} callback - Функция, вызываемая для каждого элемента списка;
+     * @param {function(any, number, ChainList): any} callback - Функция, вызываемая для каждого элемента списка;
      *            принимает три аргумента: текущий элемент, его индекс и сам список.
      * @param {Object} [thisArg={}] - Значение, используемое в качестве `this` при вызове `callback`.
      * @throws {TypeError} Если `callback` не является функцией.
-     * @returns {RelatedList} Новый список с результатами вызова `callback`.
+     * @returns {ChainList} Новый список с результатами вызова `callback`.
      * @since 0.2.0
      */
     map(callback, thisArg = {}) {
         if (typeof callback !== "function")
             throw new TypeError("callback is not a function");
-        const result = new RelatedList();
+        const result = new ChainList();
         const iterator = this[Symbol.iterator]();
         let index = 0;
         while (true) {
@@ -257,7 +239,7 @@ class RelatedList {
 
     /**
      * Вызывает указанную функцию один раз для каждого элемента списка.
-     * @param {function(any, number, RelatedList): void} callback - Функция, вызываемая для каждого элемента списка;
+     * @param {function(any, number, ChainList): void} callback - Функция, вызываемая для каждого элемента списка;
      *           принимает три аргумента: текущий элемент, его индекс и сам список.
      * @param {Object} [thisArg={}] - Значение, используемое в качестве `this` при вызове `callback`.
      * @throws {TypeError} Если `callback` не является функцией.
@@ -300,12 +282,12 @@ class RelatedList {
     /**
      * Создает копию связанного списка.
      *
-     * @returns {RelatedList} - Копия связанного списка.
+     * @returns {ChainList} - Копия связанного списка.
      * @since 0.3.0
      */
     clone() {
         const options = getOptions(this);
-        const list = new RelatedList(options);
+        const list = new ChainList(options);
 
         const iterator = this[Symbol.iterator]();
         while (true) {
@@ -352,27 +334,27 @@ class RelatedList {
 
     #addChain(strategy) {
         return function (value) {
-            const item = new Item(value);
+            const item = new Chain(value);
         }
     }
 }
 
-module.exports = RelatedList;
+module.exports = ChainList;
 
 //TODO Пересмотреть стратегии
 /**
  * Создает функцию, которая добавляет элемент в список по заданной стратегии.
  * Полученная функция используется для перебора элементов массива.
  *
- * @param {function(Item)} strategy - Функция, определяющая стратегию добавления элемента.
- * @param {RelatedList} context - Экземпляр списка к которому применяется стратегия
+ * @param {function(Chain)} strategy - Функция, определяющая стратегию добавления элемента.
+ * @param {ChainList} context - Экземпляр списка к которому применяется стратегия
  * @returns {function(any)} - Функция, которая добавляет элемент в список.
  * @since 0.3.0
  */
 function addElementByStrategy(strategy, context) {
     return (value) => {
-        const item = new Item(value);
-        // strategy(item);
+        const item = new Chain(value);
+        // strategy(chain);
         strategy.call(context, item);
         context[mainChains].add();
     };
@@ -381,7 +363,7 @@ function addElementByStrategy(strategy, context) {
 /**
  * Стратегия действий для добавления элемента в конец списка
  *
- * @param {Item} item - Элемент, который нужно добавить в конец списка.
+ * @param {Chain} item - Элемент, который нужно добавить в конец списка.
  * @since 0.3.0
  */
 function addToEnd(item) {
@@ -397,7 +379,7 @@ function addToEnd(item) {
 /**
  * Стратегия действий для добавления элемента перед текущим
  *
- * @param {Item} item - Элемент, который нужно добавить в список перед текущим элементом.
+ * @param {Chain} item - Элемент, который нужно добавить в список перед текущим элементом.
  * @since 0.3.0
  */
 function addToBefore(item) {
@@ -414,7 +396,7 @@ function addToBefore(item) {
 /**
  * Стратегия действий для добавления элемента после текущего
  *
- * @param {Item} item - Элемент, который нужно добавить в список после текущего элемента.
+ * @param {Chain} item - Элемент, который нужно добавить в список после текущего элемента.
  * @since 0.3.0
  */
 function addToAfter(item) {
@@ -432,7 +414,7 @@ function addToAfter(item) {
 /**
  * Возвращает объект опций для заданного списка
  *
- * @param {RelatedList} list - Исходный список, из которого извлекаются опции.
+ * @param {ChainList} list - Исходный список, из которого извлекаются опции.
  * @returns {Object} - Объект опций списка
  * @since 0.3.0
  */
