@@ -1,6 +1,7 @@
 const Item = require("../item");
 // Коллекция связанных списков. Используется для хранения данных связанных списков.
 const lists = new WeakMap();
+const {mainChains, lengthStrategy, directionStrategy} = require("./symbols");
 
 const loadOptions = (context, options) =>
   require("./load_options")(context, lists, options);
@@ -12,6 +13,7 @@ const scope = Symbol("RelatedListScope");
  * @since 0.1.0
  */
 class RelatedList {
+        this[mainChains] = {head: null, tail: null, current: null};
   /**
    * Создает пустой связанный список.
    * @constructor
@@ -44,6 +46,7 @@ class RelatedList {
   get length() {
     return this[scope].length();
   }
+        return this[lengthStrategy].length;
 
   /**
    * Устанавливает список в начало. Последующий вызов метода next() возвращает первый элемент списка.
@@ -52,6 +55,7 @@ class RelatedList {
   start() {
     this[scope].current = null;
   }
+        this[mainChains].current = null;
 
   /**
    * Переводит текущую позицию в начало списка и возвращает первый элемент.
@@ -66,6 +70,8 @@ class RelatedList {
     this[scope].current = this[scope].initialElement(this[scope]);
     return this.current;
   }
+        if (this[mainChains].head === null) {
+        this[mainChains].current = this.#headChain();
 
   /**
    * Переводит текущую позицию к следующему элементу и возвращает его.
@@ -81,6 +87,9 @@ class RelatedList {
       return this.head();
     }
   }
+        if (this[mainChains].current) {
+            this[mainChains].current = this.#nextChain();
+            return this.current;
 
   /**
    * Перемещает текущую позицию к предыдущему элементу и возвращает его.
@@ -93,6 +102,8 @@ class RelatedList {
     this[scope].current = this[scope].prevElement(this[scope].current);
     return this.current;
   }
+        if (!this[mainChains].current) return;
+        this[mainChains].current = this.#prevChain();
 
   /**
    * Проверяет, достигнут ли конец списка.
@@ -103,6 +114,7 @@ class RelatedList {
   isEnd() {
     return !this[scope].current || this[scope].nextElement(this[scope].current) === null;
   }
+        return !this[mainChains].current || this.#nextChain() === null;
 
   /**
    * Проверяет, вернет ли вызов метода next() элемент списка
@@ -120,6 +132,8 @@ class RelatedList {
   isEmpty() {
     return lists.get(this).head === null;
   }
+            !!this[mainChains].head &&
+            (!this[mainChains].current || this.#nextChain() !== null)
 
   /**
    * Устанавливает значение текущего элемента.
@@ -131,6 +145,11 @@ class RelatedList {
     this._checkCurrentItemExist();
     this[scope].current.content = value;
   }
+        return !this[mainChains].head;
+        if (!this[mainChains].current) return;
+        return this[mainChains].current.content;
+        if (!this[mainChains].current) throw new RangeError("The start or end of the list has been reached");
+        this[mainChains].current.content = value;
 
   /**
    * Возвращает значение текущего элемента.
@@ -336,6 +355,7 @@ function addElementByStrategy(strategy, context) {
     strategy.call(context, item);
     context[scope].length.add();
   };
+        context[mainChains].add();
 }
 
 /**
@@ -352,6 +372,8 @@ function addToEnd(item) {
     this[scope].head = item;
   }
   this[scope].tail = item;
+    if (this[mainChains].tail) {
+        this[mainChains].tail.next = item;
 }
 
 /**
