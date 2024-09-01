@@ -34,7 +34,9 @@ class RelatedList {
      * @version 0.2.0
      */
     constructor(options = {}) {
-        this[mainChains] = {head: null, tail: null, current: null};
+        this[head] = null;
+        this[tail] = null;
+        this[current] = null;
 
         this.#readOptionsSet(options);
     }
@@ -46,8 +48,8 @@ class RelatedList {
      * @readonly
      * @since 0.2.0
      */
-    get length() {
-        return this[lengthStrategy].length;
+    isEnd() {
+        return (this[current] === this[tail]) || !this[current] || false;
     }
 
     /**

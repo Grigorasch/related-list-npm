@@ -5,32 +5,30 @@
  * @since 0.1.0
  * @version 0.2.0
  */
-class Item {
-  /**
-   *
-   * @param {any} [content] - Полезная нагрузка, которая будет храниться в этом звене списка.
-   * @param {ItemOptions} [option] - Дополнительные параметры для настройки звена списка.
-   * @since 0.1.0
-   * @version 0.2.0
-   */
-  constructor(content, option = {}) {
-    const { next, previous } = option;
-    this.content = content ?? null;
-    this.next = next ?? null;
-    this.previous = previous ?? null;
-  }
+class Chain {
+    /**
+     * @param {Chain.ChainOptions} chainOptions - объект [ChainOptions]{@link Chain.ChainOptions}
+     * содержащий предустановленные свойства звена
+     */
+    constructor({previousChain = null, nextChain = null, chainContent = null}) {
+        this[prev] = previousChain;
+        this[next] = nextChain;
+        this[content] = chainContent;
+    }
 
-  /**
-   * TODO Заменить условие if на функцию валидации
-   * Ссылка на следующее звено в списке. Возвращает *null* если значение не задано.
-   * При попытке установить значение отличное от *Item* или *null* приведет к ошибке *TypeError*
-   * @type {Item|null}
-   */
-  set next(next) {
-    if (next && !(next instanceof Item))
-      throw new TypeError("Next item must be an instance of Item");
-    this._next = next ?? null;
-  }
+    /**
+     * Свойство содержит ссылку на предыдущее звено списка или null если ссылка отсутствует.
+     * Попытка установить значение отличное от *Chain* или *null* приведет к ошибке *TypeError*
+     * @type {Chain|null}
+     */
+    get prev() {
+        return this[prev];
+    }
+
+    set prev(previousChain) {
+        validateChainType(previousChain);
+        this[prev] = previousChain ?? null;
+    }
 
   get next() {
     return this._next;
