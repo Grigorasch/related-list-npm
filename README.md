@@ -2,7 +2,7 @@
 
 ## Description
 
-## What is this?
+### What is this?
 
 The module provides an implementation of such a data structure as a [linked list](https://en.wikipedia.org/wiki/Linked_list). A linked list is a collection of items, each of which stores a reference to the next item in the list, which allows you to efficiently add and remove items.
 
@@ -22,7 +22,7 @@ Before you can use a structure, you must create an instance, and then you can ad
 const RelatedList = require("related-list");
 // Create an empty structure
 const itemList = new RelatedList();
-// Add one item to the end of the list
+// Add one chain to the end of the list
 itemList.add(onceItem)
 // Add several items to the end of the list
 itemList.add(onceItem, onceItem, onceItem)
@@ -72,11 +72,11 @@ There are two methods for returning to the beginning of the list:
 const RelatedList = require("related-list");
 const itemList = new RelatedList();
 itemList.add('1', '2', '3');
-// The head() method goes to the first item and returns its value
+// The head() method goes to the first chain and returns its value
 console.log(itemList.head());  // 1
 console.log(itemList.next());  // 2
 
-// The start() method returns the list to the beginning, but does not assign the current item. This method is used to call the next() method sequentially
+// The start() method returns the list to the beginning, but does not assign the current chain. This method is used to call the next() method sequentially
 itemList.start();
 console.log(itemList.next());  // 1
 console.log(itemList.next());  // 2
