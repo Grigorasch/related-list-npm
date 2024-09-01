@@ -33,18 +33,6 @@ class RelatedList {
      */
     constructor(options = {}) {
         this[mainChains] = {head: null, tail: null, current: null};
-  /**
-   * Создает пустой связанный список.
-   * @constructor
-   * @since 0.1.0
-   */
-  constructor(options = {}) {
-    const props = {
-      head: null,
-      tail: null,
-      current: null,
-    };
-    lists.set(this, props);
 
         this.#readOptionsSet(options);
     }
@@ -163,7 +151,6 @@ class RelatedList {
     }
 
 
-
     /**
      * Добавляет новые элементы в конец списка.
      * @param {...any} values - Элементы для добавления в список.
@@ -183,7 +170,7 @@ class RelatedList {
      * @since 0.3.0
      */
     addBefore(...values) {
-        // Проверка что current элемент выбран
+        // Проверка, что current элемент выбран
         this._checkCurrentItemExist();
         // Для каждого элемента используется стратегия добавления перед текущим элементом
         values.forEach(addElementByStrategy(addToBefore, this));
@@ -197,7 +184,7 @@ class RelatedList {
      * @since 0.3.0
      */
     addAfter(...values) {
-        // Проверка что current элемент выбран
+        // Проверка, что current элемент выбран
         this._checkCurrentItemExist();
         // Для каждого элемента используется стратегия добавления после текущего элемента
         values.forEach(addElementByStrategy(addToAfter, this));
@@ -360,7 +347,7 @@ class RelatedList {
     }
 
     #addChain(strategy) {
-        return function(value) {
+        return function (value) {
             const item = new Item(value);
         }
     }
@@ -414,7 +401,6 @@ function addToBefore(item) {
         item.previous = this[scope].current.previous;
     } else {
         this[scope].head = item;
-        item;
     }
     this[scope].current.previous = item;
 }
@@ -432,7 +418,6 @@ function addToAfter(item) {
         item.next = this[scope].current.next;
     } else {
         this[scope].tail = item;
-        item;
     }
     this[scope].current.next = item;
     this.next();
