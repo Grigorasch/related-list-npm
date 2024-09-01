@@ -1,6 +1,6 @@
 const Item = require("./");
 
-describe("Тесты класса Item", () => {
+describe("Тесты класса Chain", () => {
     describe("Конструктор", () => {
         test("должен создать экземпляр с правильными аргументами", () => {
             const item = new Item();
@@ -61,7 +61,7 @@ describe("Тесты класса Item", () => {
     });
 
     describe("Вспомогательные функции", () => {
-      test("должен пропускать null и Item объекты, на остальное выбрасывает TypeError", ()=>{
+      test("должен пропускать null и Chain объекты, на остальное выбрасывает TypeError", ()=>{
         const item = new Item();
         expect(() => item._assertIsItem(null)).not.toThrow();
         expect(() => item._assertIsItem(new Item())).not.toThrow();

@@ -3,6 +3,34 @@
  * @module Validate
  */
 
+const Chain = require("../chain");
+
+/**
+ * Стратегии валидации
+ */
+
+/**
+ * Стратегия валидации классических JavaScript объектов.
+ * @param {any} obj - значение для которого выполняется валидация
+ * @returns {boolean} - результат валидации значения *obj*
+ */
+function objectStrategy(obj) {
+    return obj && typeof obj === "object" && obj.constructor === Object;
+}
+
+function chainStrategy(chain) {
+    return chain instanceof Chain;
+}
+
+function chainWithNullStrategy(chain) {
+    return (chain == null) || (chain instanceof Chain);
+}
+
+
+/**
+ * Функции валидации
+ */
+
 /**
  * Общая функция валидации. Выполняет валидацию значения *value* по заданной стратегии *strategy*.
  * Если стратегия возвращает true, то валидация считается пройденной. В противном случае выбрасывается
@@ -20,22 +48,21 @@ function validateType(strategy, value, message) {
 }
 
 /**
- * Стратегия валидации классических JavaScript объектов.
- * @param {any} obj - значение для которого выполняется валидация
- * @returns {boolean} - результат валидации значения *obj*
- */
-function objectStrategy(obj) {
-    return obj && typeof obj === "object" && obj.constructor === Object;
-}
-
-/**
  * Функция валидации значения *obj* на соответствие классическому JavaScript объекту
  * @param {any} obj - значение для которого выполняется валидация
  * @param {string} [message] - текст сообщения об ошибке
  * @throws {TypeError} - значение *obj* не является объектом Object
  */
 function validateObjectType(obj, message="The argument type must be Object") {
-    return validateType(objectStrategy, obj, message)
+    return validateType(objectStrategy, obj, message);
 }
 
-module.exports = {validateType, validateObjectType}
+function validateChainType(chain, message = "Next chain must be an instance of Chain") {
+    return validateType(chain, message = "Next chain must be an instance of Chain")
+}
+
+function validateChainTypeWithNull(chain, message = "Next chain must be an instance of Chain or null") {
+    return validateType(chainWithNullStrategy, chain, message);
+}
+
+module.exports = {validateType, validateObjectType, validateChainType, validateChainTypeWithNull}
