@@ -97,9 +97,12 @@ module.exports.directionStrategies = {NormalStrategy, ReverseStrategy};
  * при добавлении перед целевым звеном
  */
 function insertBeforeStrategy(referenceChain) {
-    return {
-        previousChain: referenceChain.prev,
-        nextChain: referenceChain,
+    return function (value) {
+        return  {
+            previousChain: referenceChain.prev,
+            nextChain: referenceChain,
+            chainContent: value
+        }
     }
 }
 
@@ -110,9 +113,12 @@ function insertBeforeStrategy(referenceChain) {
  * при добавлении после целевого звена
  */
 function insertAfterStrategy(referenceChain) {
-    return {
-        previousChain: referenceChain,
-        nextChain: referenceChain.next,
+    return function (value) {
+        return {
+            previousChain: referenceChain,
+            nextChain: referenceChain.next,
+            chainContent: value
+        }
     }
 }
 
