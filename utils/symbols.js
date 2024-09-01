@@ -26,7 +26,23 @@ const lengthStrategy = Symbol("LengthStrategy");
  */
 const directionStrategy = Symbol("DirectionStrategy");
 
+const prev = Symbol("PrevChain");
+const next = Symbol("NextChain");
+const content = Symbol("ChainContent");
+
+const head = Symbol("HeadChainOfList");
+const tail = Symbol("TailChainOfList");
+const current = Symbol("CurrentChainOfList");
+
 module.exports = {
+    prev,
+    next,
+    content,
+
+    head,
+    tail,
+    current,
+
     mainChains,
     lengthStrategy,
     directionStrategy
