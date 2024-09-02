@@ -26,6 +26,14 @@ const lengthStrategy = Symbol("LengthStrategy");
  */
 const directionStrategy = Symbol("DirectionStrategy");
 
+/**
+ * Символы объекта Chain
+ */
+
+/**
+ * @@PreviousChain символ указывает на ссылку предыдущего звена
+ * @type {symbol}
+ */
 const prev = Symbol("PrevChain");
 const next = Symbol("NextChain");
 const content = Symbol("ChainContent");

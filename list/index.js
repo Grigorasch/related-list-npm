@@ -23,7 +23,7 @@ class ChainedList {
      * В конструктор можно передать объект [options]{@link ChainedList.ListOptions}
      * чтобы добавить дополнительную функциональность списку. После создания списка, изменение
      * параметров [options]{@link ChainedList.ListOptions} невозможно.
-     * ADD добавить обработку ListOptions
+     * TODO ADD добавить обработку ListOptions
      * **В данной версии дополнительная функциональность отключена**
      * @constructor
      *
@@ -80,7 +80,7 @@ class ChainedList {
         this[current].content = value;
     }
 
-    // FIX проверить и исправить методы
+    // TODO FIX проверить и исправить методы
     // /**
     //  * Количество элементов в списке. Числовое значение доступно если в ListOptions указан флаг *lengthCount = true*.
     //  * В противном случае, доступ к полю length сохраняется, его значение всегда равно *false*
@@ -113,7 +113,6 @@ class ChainedList {
     //     this[mainChains].current = this.#headChain();
     //     return this.current;
     // }
-
 
 
     /**
@@ -338,14 +337,10 @@ class ChainedList {
     }
 
     #addNewChain(strategy) {
-        return  (referenceChain, value) => {
-            if (referenceChain === null && this.isEmpty() {
-
-            } else {
-                validateChainType(referenceChain);
-            }
+        return (referenceChain, value) => {
+            validateChainType(referenceChain);
             const item = new Chain(strategy(referenceChain)(value));
-            // ADD сюда добавить счётчик добавленных элементов
+            // TODO ADD сюда добавить счётчик добавленных элементов
         }
     }
 
@@ -356,7 +351,8 @@ class ChainedList {
     }
 
     add(...values) {
-        values.forEach(value => {})
+        values.forEach(value => {
+        })
     }
 
 
@@ -364,9 +360,11 @@ class ChainedList {
 
 module.exports = ChainedList;
 
-const isEmptyChain = new Chain({chainContent: function () {
-       if (this.isEmpty())
-    }})
+const isEmptyChain = new Chain({
+    chainContent: function () {
+        // if (this.isEmpty())
+    }
+})
 
 //TODO Пересмотреть стратегии
 /**
